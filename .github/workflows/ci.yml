@@ -1,0 +1,99 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Intentional findings are disabled inline, next to the code (# shellcheck disable=...).
+      - name: shellcheck
+        run: |
+          shellcheck --version
+          shellcheck install.sh uninstall.sh tests/test-install.sh tools/sync-theme.sh
+
+      - name: Embedded theme copies are in sync
+        run: sh tools/sync-theme.sh --check
+
+      - name: PSScriptAnalyzer
+        shell: pwsh
+        run: |
+          Install-Module PSScriptAnalyzer -Force -Scope CurrentUser
+          Invoke-ScriptAnalyzer -Path . -Recurse -Severity Error -EnableExit
+
+  test-unix:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install lazygit, zsh and fish (Ubuntu)
+        if: runner.os == 'Linux'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y zsh fish
+          # Asset names changed case over time (Linux_x86_64 / linux_x86_64): match case-insensitively.
+          url=$(curl -fsSL -H "Authorization: Bearer $GH_TOKEN" \
+            https://api.github.com/repos/jesseduffield/lazygit/releases/latest \
+            | jq -r '.assets[].browser_download_url | select(test("_linux_x86_64\\.tar\\.gz$"; "i"))' \
+            | head -n 1)
+          test -n "$url"
+          echo "Downloading $url"
+          curl -fsSL -o "$RUNNER_TEMP/lazygit.tar.gz" "$url"
+          tar -xzf "$RUNNER_TEMP/lazygit.tar.gz" -C "$RUNNER_TEMP" lazygit
+          sudo install -m 755 "$RUNNER_TEMP/lazygit" /usr/local/bin/lazygit
+
+      - name: Install lazygit and fish (macOS)
+        if: runner.os == 'macOS'
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: 1
+          HOMEBREW_NO_INSTALL_CLEANUP: 1
+        run: brew install lazygit fish
+
+      - name: Show versions
+        run: |
+          lazygit --version
+          bash --version | head -n 1
+          zsh --version || true
+          fish --version || true
+
+      - name: Test (sh)
+        run: sh tests/test-install.sh
+
+      - name: Test (bash)
+        run: bash tests/test-install.sh
+
+  test-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install lazygit
+        run: choco install lazygit -y --no-progress
+
+      - name: Test (Windows PowerShell 5.1)
+        shell: powershell
+        run: powershell -NoProfile -ExecutionPolicy Bypass -File tests\test-install.ps1
+
+      - name: Test (PowerShell 7)
+        shell: pwsh
+        run: pwsh -NoProfile -ExecutionPolicy Bypass -File tests/test-install.ps1
+
+      # Git Bash: the install.sh -> install.ps1 hand-over, and install.sh itself
+      # (the tests set LGVDM_FORCE_POSIX).
+      - name: Test (Git Bash)
+        shell: bash
+        run: sh tests/test-install.sh

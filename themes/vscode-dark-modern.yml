@@ -1,0 +1,62 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/jesseduffield/lazygit/master/schema/config.json
+#
+# VS Code "Dark Modern" theme for lazygit
+# https://github.com/Makihataima-Ken/lazygit-vscode-themes
+#
+# Colors come from VS Code's own theme sources (microsoft/vscode):
+#   extensions/theme-defaults/themes/dark_modern.json  (workbench colors)
+#   extensions/git/package.json                          (gitDecoration.* defaults)
+#   src/vs/platform/theme/common/colors/listColors.ts    (list selection defaults)
+#
+# Rules for editing this file:
+#   - Every color value is a YAML list: ['#RRGGBB'] or ['#RRGGBB', bold].
+#   - Hex values MUST be quoted. An unquoted "- #0078D4" is a YAML comment.
+#   - Only #RGB / #RRGGBB work. lazygit rejects #RRGGBBAA (alpha) and draws white.
+#   - One color per list; the only extra attributes are bold / underline / reverse.
+#
+# lazygit cannot paint the background. Set your terminal background to
+# #181818 (VS Code panel terminal) or #1F1F1F (editor), and use the matching
+# ANSI palette from extras/ so hard-coded ANSI colors (staged files, commit
+# hashes, diff +/-) match VS Code too.
+
+gui:
+  # VS Code panels have square corners.
+  border: single
+
+  theme:
+    # focusBorder / tab.activeBorderTop
+    activeBorderColor:
+      - '#0078D4'
+      - bold
+    # activityBar.inactiveForeground: unfocused chrome, still >= 4.5:1 on #181818 / #1F1F1F
+    inactiveBorderColor:
+      - '#868686'
+    # editorWarning.foreground / list.warningForeground (VS Code amber)
+    searchingActiveBorderColor:
+      - '#CCA700'
+      - bold
+    # textLink.foreground (keybinding hints in the bottom bar)
+    optionsTextColor:
+      - '#4DAAFC'
+    # list.activeSelectionBackground
+    selectedLineBgColor:
+      - '#04395E'
+    # list.inactiveSelectionBackground
+    inactiveViewSelectedLineBgColor:
+      - '#37373D'
+    # button.foreground on button.background
+    cherryPickedCommitFgColor:
+      - '#FFFFFF'
+    cherryPickedCommitBgColor:
+      - '#0078D4'
+    # editor.findMatchBackground (no visible effect in lazygit 0.65, kept for newer versions)
+    markedBaseCommitFgColor:
+      - '#FFFFFF'
+    markedBaseCommitBgColor:
+      - '#9E6A03'
+    # gitDecoration.modifiedResourceForeground
+    unstagedChangesColor:
+      - '#E2C08D'
+    # foreground
+    defaultFgColor:
+      - '#CCCCCC'
