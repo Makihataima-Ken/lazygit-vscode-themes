@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Catalog-driven theme installation with VS Code Dark Modern, Light Modern, and Tokyo Night.
 - Tokyo Night UI theme and matching Windows Terminal palette, based on the Tokyo Night `night` palette.
 - Neon Test UI theme: a high-contrast installer check that does not require changing terminal settings.
+- Ports of the built-in VS Code Dark 2026, Abyss, Dark (Visual Studio), Dark+, Kimbie Dark, Monokai, Monokai Dimmed, Red, Solarized Dark, and Tomorrow Night Blue themes, each with a Windows Terminal palette.
 - `-Theme` / `--theme` selection and `-ListThemes` / `--list-themes` discovery commands.
 - Matching Windows Terminal palette files for every catalog theme.
 

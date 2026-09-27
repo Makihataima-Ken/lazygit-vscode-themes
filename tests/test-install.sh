@@ -974,6 +974,14 @@ test_12_lazygit() {
     fail "(12) lazygit loads the overlay LG_CONFIG_FILE" "$(cat "$SB/lg.out")"
   fi
 
+  for _v12_theme_id in $THEME_IDS; do
+    if lg_validate "$CFG/themes/$_v12_theme_id.yml,$C"; then
+      pass "(12) lazygit loads catalog theme $_v12_theme_id in overlay mode"
+    else
+      fail "(12) lazygit loads catalog theme $_v12_theme_id in overlay mode" "$(cat "$SB/lg.out")"
+    fi
+  done
+
   printf 'git:\n  autoFetch: false\ngui:\n  showIcons: false\n' >"$C"
   if lg_validate "$_v12"; then
     pass "(12) lazygit loads the theme followed by a config.yml with its own gui: key"

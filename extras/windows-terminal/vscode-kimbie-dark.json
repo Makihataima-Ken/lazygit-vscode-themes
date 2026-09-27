@@ -1,0 +1,23 @@
+{
+  "name": "VS Code Kimbie Dark",
+  "background": "#221A0F",
+  "foreground": "#D3AF86",
+  "cursorColor": "#A57A4C",
+  "selectionBackground": "#7C5021",
+  "black": "#131510",
+  "red": "#DC3958",
+  "green": "#889B4A",
+  "yellow": "#F79A32",
+  "blue": "#1B60A5",
+  "purple": "#98676A",
+  "cyan": "#8AB1B0",
+  "white": "#D3AF86",
+  "brightBlack": "#423523",
+  "brightRed": "#F06431",
+  "brightGreen": "#A8B45A",
+  "brightYellow": "#F79A32",
+  "brightBlue": "#5B7E7A",
+  "brightPurple": "#E3B583",
+  "brightCyan": "#8AB1B0",
+  "brightWhite": "#CCCCCC"
+}

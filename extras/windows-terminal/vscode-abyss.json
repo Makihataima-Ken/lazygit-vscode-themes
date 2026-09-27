@@ -1,0 +1,23 @@
+{
+  "name": "VS Code Abyss",
+  "background": "#000C18",
+  "foreground": "#6688CC",
+  "cursorColor": "#80BAFF",
+  "selectionBackground": "#08286B",
+  "black": "#000C18",
+  "red": "#FF7882",
+  "green": "#22AA44",
+  "yellow": "#FFE580",
+  "blue": "#2277FF",
+  "purple": "#F280D0",
+  "cyan": "#78FFFF",
+  "white": "#E0EDDD",
+  "brightBlack": "#152037",
+  "brightRed": "#FF9DA4",
+  "brightGreen": "#B8F171",
+  "brightYellow": "#FFEEAD",
+  "brightBlue": "#80BAFF",
+  "brightPurple": "#EBBBFF",
+  "brightCyan": "#99FFFF",
+  "brightWhite": "#FFFFFF"
+}

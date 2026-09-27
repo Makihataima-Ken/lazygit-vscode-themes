@@ -1,0 +1,35 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/jesseduffield/lazygit/master/schema/config.json
+# VS Code "Tomorrow Night Blue" theme for lazygit.
+# Source: microsoft/vscode extensions/theme-tomorrow-night-blue/themes/tomorrow-night-blue-color-theme.json
+# VS Code uses translucent white selection backgrounds; LazyGit uses the
+# equivalent visible blue shades as opaque colors.
+
+gui:
+  border: single
+  theme:
+    activeBorderColor:
+      - '#BBDAFF'
+      - bold
+    inactiveBorderColor:
+      - '#7285B7'
+    searchingActiveBorderColor:
+      - '#FFC58F'
+      - bold
+    optionsTextColor:
+      - '#80BAFF'
+    selectedLineBgColor:
+      - '#607692'
+    inactiveViewSelectedLineBgColor:
+      - '#405B7D'
+    cherryPickedCommitFgColor:
+      - '#FFFFFF'
+    cherryPickedCommitBgColor:
+      - '#3E999F'
+    markedBaseCommitFgColor:
+      - '#002451'
+    markedBaseCommitBgColor:
+      - '#FFC58F'
+    unstagedChangesColor:
+      - '#F99DA5'
+    defaultFgColor:
+      - '#FFFFFF'

@@ -4,7 +4,17 @@ A catalog of [lazygit](https://github.com/jesseduffield/lazygit) themes inspired
 
 | ID | Theme | Windows Terminal palette |
 |---|---|---|
+| `vscode-dark-2026` | VS Code Dark 2026 | [`vscode-dark-2026.json`](extras/windows-terminal/vscode-dark-2026.json) |
+| `vscode-abyss` | VS Code Abyss | [`vscode-abyss.json`](extras/windows-terminal/vscode-abyss.json) |
+| `vscode-dark-visual-studio` | VS Code Dark (Visual Studio) | [`vscode-dark-visual-studio.json`](extras/windows-terminal/vscode-dark-visual-studio.json) |
+| `vscode-dark-plus` | VS Code Dark+ | [`vscode-dark-plus.json`](extras/windows-terminal/vscode-dark-plus.json) |
 | `vscode-dark-modern` | VS Code Dark Modern | [`vscode-dark-modern.json`](extras/windows-terminal/vscode-dark-modern.json) |
+| `vscode-kimbie-dark` | VS Code Kimbie Dark | [`vscode-kimbie-dark.json`](extras/windows-terminal/vscode-kimbie-dark.json) |
+| `vscode-monokai` | VS Code Monokai | [`vscode-monokai.json`](extras/windows-terminal/vscode-monokai.json) |
+| `vscode-monokai-dimmed` | VS Code Monokai Dimmed | [`vscode-monokai-dimmed.json`](extras/windows-terminal/vscode-monokai-dimmed.json) |
+| `vscode-red` | VS Code Red | [`vscode-red.json`](extras/windows-terminal/vscode-red.json) |
+| `vscode-solarized-dark` | VS Code Solarized Dark | [`vscode-solarized-dark.json`](extras/windows-terminal/vscode-solarized-dark.json) |
+| `vscode-tomorrow-night-blue` | VS Code Tomorrow Night Blue | [`vscode-tomorrow-night-blue.json`](extras/windows-terminal/vscode-tomorrow-night-blue.json) |
 | `vscode-light-modern` | VS Code Light Modern | [`vscode-light-modern.json`](extras/windows-terminal/vscode-light-modern.json) |
 | `tokyo-night` | Tokyo Night | [`tokyo-night.json`](extras/windows-terminal/tokyo-night.json) |
 | `neon-test` | Neon Test (terminal-independent) | [`neon-test.json`](extras/windows-terminal/neon-test.json) — optional |
@@ -119,6 +129,16 @@ For a visibly different dark theme, select Tokyo Night:
 
 ```sh
 sh install.sh --theme tokyo-night
+```
+
+The built-in VS Code themes from the Dark theme picker are available by ID too. For example:
+
+```powershell
+.\install.ps1 -Theme vscode-monokai
+```
+
+```sh
+sh install.sh --theme vscode-solarized-dark
 ```
 
 To verify that installation and switching work without changing any terminal settings, select Neon Test. Its magenta focused borders, cyan unfocused borders, yellow search frame, and blue selected row are set directly by LazyGit; it deliberately leaves your terminal foreground and background alone.
@@ -286,7 +306,7 @@ Terminals that were already open keep the old `LG_CONFIG_FILE`, and lazygit star
 
 ## Theme colors
 
-The following table documents Dark Modern. Light Modern and the noticeably more colorful [Tokyo Night](themes/tokyo-night.yml) are defined alongside it. [Neon Test](themes/neon-test.yml) is a terminal-independent installer check: it does not override LazyGit's default foreground color. Every catalogue theme uses `border: single` for square panel corners.
+The following table documents Dark Modern. The catalog also ports the built-in VS Code Dark 2026, Abyss, Dark (Visual Studio), Dark+, Kimbie Dark, Monokai, Monokai Dimmed, Red, Solarized Dark, and Tomorrow Night Blue theme sources. [Neon Test](themes/neon-test.yml) is a terminal-independent installer check: it does not override LazyGit's default foreground color. Every catalogue theme uses `border: single` for square panel corners.
 
 | lazygit key (`gui.theme.`) | Value | VS Code color | What it colors in lazygit |
 |---|---|---|---|
@@ -314,7 +334,7 @@ lazygit also can't paint the background: you see your terminal's. That's why the
 
 ## Terminal colors
 
-LazyGit changes its UI colors, not the terminal palette. Select the matching terminal palette yourself: [`vscode-dark-modern.json`](extras/windows-terminal/vscode-dark-modern.json), [`vscode-light-modern.json`](extras/windows-terminal/vscode-light-modern.json), or [`tokyo-night.json`](extras/windows-terminal/tokyo-night.json). The [`neon-test.json`](extras/windows-terminal/neon-test.json) palette is optional: Neon Test remains visibly different without importing it. If you run LazyGit in VS Code's integrated terminal with the same VS Code theme, the colors already match.
+LazyGit changes its UI colors, not the terminal palette. Every catalog row above links its matching Windows Terminal palette. The [`neon-test.json`](extras/windows-terminal/neon-test.json) palette is optional: Neon Test remains visibly different without importing it. If you run LazyGit in VS Code's integrated terminal with the same VS Code theme, the colors already match.
 
 **Windows Terminal:** open Settings, then "Open JSON file". Paste the object for the selected catalog theme into the `schemes` list; Dark Modern, for example:
 

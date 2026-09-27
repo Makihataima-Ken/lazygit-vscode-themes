@@ -1,0 +1,34 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/jesseduffield/lazygit/master/schema/config.json
+# VS Code "Solarized Dark" theme for lazygit.
+# Source: microsoft/vscode extensions/theme-solarized-dark/themes/solarized-dark-color-theme.json
+# VS Code uses translucent teal focus/selection colors; LazyGit uses opaque values.
+
+gui:
+  border: single
+  theme:
+    activeBorderColor:
+      - '#2AA198'
+      - bold
+    inactiveBorderColor:
+      - '#586E75'
+    searchingActiveBorderColor:
+      - '#B58900'
+      - bold
+    optionsTextColor:
+      - '#268BD2'
+    selectedLineBgColor:
+      - '#005A6F'
+    inactiveViewSelectedLineBgColor:
+      - '#004454'
+    cherryPickedCommitFgColor:
+      - '#002B36'
+    cherryPickedCommitBgColor:
+      - '#2AA198'
+    markedBaseCommitFgColor:
+      - '#002B36'
+    markedBaseCommitBgColor:
+      - '#B58900'
+    unstagedChangesColor:
+      - '#CB4B16'
+    defaultFgColor:
+      - '#839496'

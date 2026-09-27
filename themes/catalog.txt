@@ -3,7 +3,17 @@
 # IDs are stable command-line values.  They must use lowercase letters,
 # numbers and single hyphens only.  Every entry needs both themes/<id>.yml
 # and extras/windows-terminal/<id>.json.
+vscode-dark-2026|VS Code Dark 2026
+vscode-abyss|VS Code Abyss
+vscode-dark-visual-studio|VS Code Dark (Visual Studio)
+vscode-dark-plus|VS Code Dark+
 vscode-dark-modern|VS Code Dark Modern
+vscode-kimbie-dark|VS Code Kimbie Dark
+vscode-monokai|VS Code Monokai
+vscode-monokai-dimmed|VS Code Monokai Dimmed
+vscode-red|VS Code Red
+vscode-solarized-dark|VS Code Solarized Dark
+vscode-tomorrow-night-blue|VS Code Tomorrow Night Blue
 vscode-light-modern|VS Code Light Modern
 tokyo-night|Tokyo Night
 neon-test|Neon Test (terminal-independent)

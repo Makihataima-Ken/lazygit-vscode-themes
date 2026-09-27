@@ -1,0 +1,23 @@
+{
+  "name": "VS Code Dark+",
+  "background": "#1E1E1E",
+  "foreground": "#D4D4D4",
+  "cursorColor": "#569CD6",
+  "selectionBackground": "#094771",
+  "black": "#000000",
+  "red": "#D16969",
+  "green": "#B5CEA8",
+  "yellow": "#DCDCAA",
+  "blue": "#569CD6",
+  "purple": "#C586C0",
+  "cyan": "#4EC9B0",
+  "white": "#D4D4D4",
+  "brightBlack": "#808080",
+  "brightRed": "#F44747",
+  "brightGreen": "#B5CEA8",
+  "brightYellow": "#FFFFA5",
+  "brightBlue": "#9CDCFE",
+  "brightPurple": "#D7A7D5",
+  "brightCyan": "#4FC1FF",
+  "brightWhite": "#FFFFFF"
+}

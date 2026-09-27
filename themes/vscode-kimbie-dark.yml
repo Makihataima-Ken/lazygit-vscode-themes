@@ -1,0 +1,33 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/jesseduffield/lazygit/master/schema/config.json
+# VS Code "Kimbie Dark" theme for lazygit.
+# Source: microsoft/vscode extensions/theme-kimbie-dark/themes/kimbie-dark-color-theme.json
+
+gui:
+  border: single
+  theme:
+    activeBorderColor:
+      - '#A57A4C'
+      - bold
+    inactiveBorderColor:
+      - '#645342'
+    searchingActiveBorderColor:
+      - '#F79A32'
+      - bold
+    optionsTextColor:
+      - '#8AB1B0'
+    selectedLineBgColor:
+      - '#7C5021'
+    inactiveViewSelectedLineBgColor:
+      - '#645342'
+    cherryPickedCommitFgColor:
+      - '#D3AF86'
+    cherryPickedCommitBgColor:
+      - '#6E583B'
+    markedBaseCommitFgColor:
+      - '#221A0F'
+    markedBaseCommitBgColor:
+      - '#F06431'
+    unstagedChangesColor:
+      - '#DC3958'
+    defaultFgColor:
+      - '#D3AF86'

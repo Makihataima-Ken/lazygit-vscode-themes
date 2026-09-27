@@ -918,7 +918,7 @@ Invoke-Check '(12) overlay warns when config.yml sets gui.theme (and only then)'
     Assert-True ($script:LastOutput -match 'sets gui\.theme') "expected a gui.theme warning for a UTF-16 config.yml; output:`n$script:LastOutput"
 }
 
-Invoke-Check '(13) lazygit accepts the overlay LG_CONFIG_FILE (theme first, user gui: settings after it)' {
+Invoke-Check '(13) lazygit accepts every catalog theme in overlay mode (theme first, user gui: settings after it)' {
     if (-not $script:RealLazygit) { Write-Warning 'lazygit not found; skipping'; Skip-Check 'lazygit not found' }
     $b = New-Box 'lazygit-overlay'
     Write-Bytes $b.Config "gui:`n  nerdFontsVersion: `"3`"`n"
@@ -926,8 +926,11 @@ Invoke-Check '(13) lazygit accepts the overlay LG_CONFIG_FILE (theme first, user
     Install-Box $b
     $files = @((Get-TestLg).Split(','))
     Assert-Equal 2 $files.Count 'entries in LG_CONFIG_FILE'
-    $out = Invoke-LazygitValidation 'overlay' $files
-    Assert-True ($out.Contains($ValidPhrase)) "lazygit rejected the config:`n$out"
+    foreach ($entry in $script:Catalog) {
+        $files[0] = Join-Path $b.Themes ($entry.Id + '.yml')
+        $out = Invoke-LazygitValidation ('overlay-' + $entry.Id) $files
+        Assert-True ($out.Contains($ValidPhrase)) "lazygit rejected the $($entry.Id) overlay config:`n$out"
+    }
 }
 
 Invoke-Check '(13) lazygit accepts an append-mode config.yml (CRLF user content + LF block)' {

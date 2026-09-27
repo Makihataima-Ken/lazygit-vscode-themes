@@ -1,0 +1,33 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/jesseduffield/lazygit/master/schema/config.json
+# VS Code "Monokai Dimmed" theme for lazygit.
+# Source: microsoft/vscode extensions/theme-monokai-dimmed/themes/dimmed-monokai-color-theme.json
+
+gui:
+  border: single
+  theme:
+    activeBorderColor:
+      - '#3655B5'
+      - bold
+    inactiveBorderColor:
+      - '#666666'
+    searchingActiveBorderColor:
+      - '#D0B344'
+      - bold
+    optionsTextColor:
+      - '#66D9EF'
+    selectedLineBgColor:
+      - '#707070'
+    inactiveViewSelectedLineBgColor:
+      - '#4E4E4E'
+    cherryPickedCommitFgColor:
+      - '#1E1E1E'
+    cherryPickedCommitBgColor:
+      - '#FF0080'
+    markedBaseCommitFgColor:
+      - '#1E1E1E'
+    markedBaseCommitBgColor:
+      - '#D9B700'
+    unstagedChangesColor:
+      - '#C7444A'
+    defaultFgColor:
+      - '#C5C8C6'

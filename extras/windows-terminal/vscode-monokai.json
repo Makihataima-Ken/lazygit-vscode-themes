@@ -1,0 +1,23 @@
+{
+  "name": "VS Code Monokai",
+  "background": "#272822",
+  "foreground": "#F8F8F2",
+  "cursorColor": "#F8F8F0",
+  "selectionBackground": "#75715E",
+  "black": "#272822",
+  "red": "#F92672",
+  "green": "#A6E22E",
+  "yellow": "#E6DB74",
+  "blue": "#66D9EF",
+  "purple": "#AE81FF",
+  "cyan": "#66D9EF",
+  "white": "#F8F8F2",
+  "brightBlack": "#75715E",
+  "brightRed": "#F92672",
+  "brightGreen": "#A6E22E",
+  "brightYellow": "#E6DB74",
+  "brightBlue": "#66D9EF",
+  "brightPurple": "#AE81FF",
+  "brightCyan": "#A1EFE4",
+  "brightWhite": "#F8F8F0"
+}

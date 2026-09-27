@@ -1,0 +1,23 @@
+{
+  "name": "VS Code Monokai Dimmed",
+  "background": "#1E1E1E",
+  "foreground": "#C5C8C6",
+  "cursorColor": "#3655B5",
+  "selectionBackground": "#707070",
+  "black": "#1E1E1E",
+  "red": "#C7444A",
+  "green": "#86B42B",
+  "yellow": "#D0B344",
+  "blue": "#6089B4",
+  "purple": "#9872A2",
+  "cyan": "#56ADBC",
+  "white": "#C5C8C6",
+  "brightBlack": "#666666",
+  "brightRed": "#FF0B00",
+  "brightGreen": "#A6E22E",
+  "brightYellow": "#D9B700",
+  "brightBlue": "#819AFF",
+  "brightPurple": "#AE81FF",
+  "brightCyan": "#66D9EF",
+  "brightWhite": "#FFFFFF"
+}

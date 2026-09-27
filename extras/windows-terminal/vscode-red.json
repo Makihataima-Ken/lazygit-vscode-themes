@@ -1,0 +1,23 @@
+{
+  "name": "VS Code Red",
+  "background": "#390000",
+  "foreground": "#F8F8F8",
+  "cursorColor": "#FF4444",
+  "selectionBackground": "#880000",
+  "black": "#220000",
+  "red": "#EC0D1E",
+  "green": "#CC9999",
+  "yellow": "#FFD0AA",
+  "blue": "#DB7E58",
+  "purple": "#CC3333",
+  "cyan": "#FFEAEA",
+  "white": "#F8F8F8",
+  "brightBlack": "#772222",
+  "brightRed": "#FF4444",
+  "brightGreen": "#FFD0AA",
+  "brightYellow": "#FFEAEA",
+  "brightBlue": "#DB7E58",
+  "brightPurple": "#FF4444",
+  "brightCyan": "#FFFFFF",
+  "brightWhite": "#FFFFFF"
+}

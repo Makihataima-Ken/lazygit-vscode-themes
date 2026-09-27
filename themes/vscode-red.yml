@@ -1,0 +1,34 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/jesseduffield/lazygit/master/schema/config.json
+# VS Code "Red" theme for lazygit.
+# Source: microsoft/vscode extensions/theme-red/themes/Red-color-theme.json
+# VS Code uses translucent focus red; LazyGit uses its opaque base hue.
+
+gui:
+  border: single
+  theme:
+    activeBorderColor:
+      - '#FF4444'
+      - bold
+    inactiveBorderColor:
+      - '#CC9999'
+    searchingActiveBorderColor:
+      - '#FFD0AA'
+      - bold
+    optionsTextColor:
+      - '#DB7E58'
+    selectedLineBgColor:
+      - '#880000'
+    inactiveViewSelectedLineBgColor:
+      - '#770000'
+    cherryPickedCommitFgColor:
+      - '#F8F8F8'
+    cherryPickedCommitBgColor:
+      - '#883333'
+    markedBaseCommitFgColor:
+      - '#390000'
+    markedBaseCommitBgColor:
+      - '#FFD0AA'
+    unstagedChangesColor:
+      - '#EC0D1E'
+    defaultFgColor:
+      - '#F8F8F8'

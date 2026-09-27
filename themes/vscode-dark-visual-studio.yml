@@ -1,0 +1,33 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/jesseduffield/lazygit/master/schema/config.json
+# VS Code "Dark (Visual Studio)" theme for lazygit.
+# Source: microsoft/vscode extensions/theme-defaults/themes/dark_vs.json
+
+gui:
+  border: single
+  theme:
+    activeBorderColor:
+      - '#007ACC'
+      - bold
+    inactiveBorderColor:
+      - '#A6A6A6'
+    searchingActiveBorderColor:
+      - '#D7BA7D'
+      - bold
+    optionsTextColor:
+      - '#9CDCFE'
+    selectedLineBgColor:
+      - '#094771'
+    inactiveViewSelectedLineBgColor:
+      - '#3A3D41'
+    cherryPickedCommitFgColor:
+      - '#FFFFFF'
+    cherryPickedCommitBgColor:
+      - '#007ACC'
+    markedBaseCommitFgColor:
+      - '#1E1E1E'
+    markedBaseCommitBgColor:
+      - '#D7BA7D'
+    unstagedChangesColor:
+      - '#CE9178'
+    defaultFgColor:
+      - '#D4D4D4'

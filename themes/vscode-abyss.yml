@@ -1,0 +1,33 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/jesseduffield/lazygit/master/schema/config.json
+# VS Code "Abyss" theme for lazygit.
+# Source: microsoft/vscode extensions/theme-abyss/themes/abyss-color-theme.json
+
+gui:
+  border: single
+  theme:
+    activeBorderColor:
+      - '#596F99'
+      - bold
+    inactiveBorderColor:
+      - '#384887'
+    searchingActiveBorderColor:
+      - '#F280D0'
+      - bold
+    optionsTextColor:
+      - '#6688CC'
+    selectedLineBgColor:
+      - '#08286B'
+    inactiveViewSelectedLineBgColor:
+      - '#152037'
+    cherryPickedCommitFgColor:
+      - '#E0EDDD'
+    cherryPickedCommitBgColor:
+      - '#2B3C5D'
+    markedBaseCommitFgColor:
+      - '#000C18'
+    markedBaseCommitBgColor:
+      - '#FFE580'
+    unstagedChangesColor:
+      - '#22AA44'
+    defaultFgColor:
+      - '#6688CC'

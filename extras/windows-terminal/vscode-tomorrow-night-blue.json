@@ -1,0 +1,23 @@
+{
+  "name": "VS Code Tomorrow Night Blue",
+  "background": "#002451",
+  "foreground": "#FFFFFF",
+  "cursorColor": "#BBDAFF",
+  "selectionBackground": "#607692",
+  "black": "#001126",
+  "red": "#F99DA5",
+  "green": "#B8F171",
+  "yellow": "#FFC58F",
+  "blue": "#4271AE",
+  "purple": "#D778FF",
+  "cyan": "#80BAFF",
+  "white": "#FFFFFF",
+  "brightBlack": "#405B7D",
+  "brightRed": "#FF7882",
+  "brightGreen": "#D1F1A9",
+  "brightYellow": "#FFEEAD",
+  "brightBlue": "#BBDAFF",
+  "brightPurple": "#EBBBFF",
+  "brightCyan": "#99FFFF",
+  "brightWhite": "#FFFFFF"
+}
