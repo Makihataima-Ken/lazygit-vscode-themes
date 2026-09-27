@@ -77,6 +77,7 @@ generate_region() {
       printf '%s\n' "\$EmbeddedCatalog = @'"
       emit_catalog_rows
       printf '%s\n' "'@"
+      # shellcheck disable=SC2016 # literal PowerShell source for the generated installer
       printf '%s\n' '$EmbeddedThemes = @{'
       for _gr_id in $THEME_IDS; do
         printf "    '%s' = @'\n" "$_gr_id"
@@ -91,6 +92,7 @@ generate_region() {
       printf '%s\n' 'LGVDM_CATALOG_EOF'
       printf '%s\n' '}'
       printf '%s\n' 'embedded_theme() {'
+      # shellcheck disable=SC2016 # literal shell source for the generated installer
       printf '%s\n' '  case $1 in'
       for _gr_id in $THEME_IDS; do
         _gr_delim=$(theme_delimiter "$_gr_id")

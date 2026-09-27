@@ -667,16 +667,22 @@ posix_block() {
     printf '%s\n' "lgvdm_owned=$_q$(sq "$OWNED_THEME_LIST")$_q"
     printf '%s\n' 'if [ -f "$lgvdm_theme" ]; then'
     printf '%s\n' '  lgvdm_rest='
-    printf '%s\n' '  lgvdm_oldifs=$IFS; IFS=,'
-    printf '%s\n' '  for lgvdm_entry in ${LG_CONFIG_FILE-}; do'
+    # Do not use unquoted parameter expansion with IFS here. zsh deliberately
+    # does not perform that split unless SH_WORD_SPLIT is enabled, which would
+    # leave the prior catalog theme in LG_CONFIG_FILE after a switch.
+    printf '%s\n' '  lgvdm_entries=${LG_CONFIG_FILE-}'
+    printf '%s\n' '  while [ -n "$lgvdm_entries" ]; do'
+    printf '%s\n' '    case $lgvdm_entries in'
+    printf '%s\n' '      *,*) lgvdm_entry=${lgvdm_entries%%,*}; lgvdm_entries=${lgvdm_entries#*,} ;;'
+    printf '%s\n' '      *) lgvdm_entry=$lgvdm_entries; lgvdm_entries= ;;'
+    printf '%s\n' '    esac'
     printf '%s\n' '    [ -n "$lgvdm_entry" ] || continue'
     printf '%s\n' '    case ",$lgvdm_owned," in *,"$lgvdm_entry",*) ;; *) lgvdm_rest=${lgvdm_rest:+$lgvdm_rest,}$lgvdm_entry ;; esac'
     printf '%s\n' '  done'
-    printf '%s\n' '  IFS=$lgvdm_oldifs'
     printf '%s\n' '  if [ -z "$lgvdm_rest" ] && [ -f "$lgvdm_config" ]; then lgvdm_rest=$lgvdm_config; fi'
     printf '%s\n' '  export LG_CONFIG_FILE="$lgvdm_theme${lgvdm_rest:+,$lgvdm_rest}"'
     printf '%s\n' 'fi'
-    printf '%s\n' 'unset lgvdm_theme lgvdm_config lgvdm_owned lgvdm_rest lgvdm_oldifs lgvdm_entry'
+    printf '%s\n' 'unset lgvdm_theme lgvdm_config lgvdm_owned lgvdm_rest lgvdm_entries lgvdm_entry'
     printf '%s\n' "$LGVDM_END"
   } >"$1"
 }
