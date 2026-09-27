@@ -1,6 +1,13 @@
-# lazygit VS Code Dark Modern
+# lazygit VS Code themes
 
-A [lazygit](https://github.com/jesseduffield/lazygit) theme that uses the colors of VS Code's default **Dark Modern** theme, with installers for Windows, macOS and Linux and a matching terminal color scheme.
+A catalog of [lazygit](https://github.com/jesseduffield/lazygit) themes inspired by VS Code. The installers work on Windows, macOS, and Linux, install every bundled theme, and select one active theme.
+
+| ID | Theme | Windows Terminal palette |
+|---|---|---|
+| `vscode-dark-modern` | VS Code Dark Modern | [`vscode-dark-modern.json`](extras/windows-terminal/vscode-dark-modern.json) |
+| `vscode-light-modern` | VS Code Light Modern | [`vscode-light-modern.json`](extras/windows-terminal/vscode-light-modern.json) |
+| `tokyo-night` | Tokyo Night | [`tokyo-night.json`](extras/windows-terminal/tokyo-night.json) |
+| `neon-test` | Neon Test (terminal-independent) | [`neon-test.json`](extras/windows-terminal/neon-test.json) — optional |
 
 - [Requirements](#requirements)
 - [Install](#install)
@@ -31,20 +38,20 @@ From a clone:
 
 ```powershell
 git clone https://github.com/Makihataima-Ken/lazygit-vscode-themes.git
-cd lazygit-vscode-dark-modern
+cd lazygit-vscode-themes
 powershell -NoProfile -ExecutionPolicy Bypass -File .\install.ps1
 ```
 
 Without cloning:
 
 ```powershell
-& ([scriptblock]::Create((irm https://raw.githubusercontent.com/OWNER/lazygit-vscode-dark-modern/main/install.ps1)))
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/Makihataima-Ken/lazygit-vscode-themes/main/install.ps1)))
 ```
 
 Without cloning, with options (here: append mode):
 
 ```powershell
-& ([scriptblock]::Create((irm https://raw.githubusercontent.com/OWNER/lazygit-vscode-dark-modern/main/install.ps1))) -Mode Append
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/Makihataima-Ken/lazygit-vscode-themes/main/install.ps1))) -Mode Append
 ```
 
 The shorter `irm <url> | iex` also installs, but it runs the script in your session's own scope, so it resets any variables named `$Mode`, `$ConfigDir`, `$Uninstall` or `$NoPersist` you have there. The script block form above runs in a child scope.
@@ -55,20 +62,20 @@ From a clone:
 
 ```sh
 git clone https://github.com/Makihataima-Ken/lazygit-vscode-themes.git
-cd lazygit-vscode-dark-modern
+cd lazygit-vscode-themes
 sh install.sh
 ```
 
 Without cloning:
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/OWNER/lazygit-vscode-dark-modern/main/install.sh | sh
+curl -fsSL https://raw.githubusercontent.com/Makihataima-Ken/lazygit-vscode-themes/main/install.sh | sh
 ```
 
 Without cloning, with options (here: append mode):
 
 ```sh
-curl -fsSL https://raw.githubusercontent.com/OWNER/lazygit-vscode-dark-modern/main/install.sh | sh -s -- --mode append
+curl -fsSL https://raw.githubusercontent.com/Makihataima-Ken/lazygit-vscode-themes/main/install.sh | sh -s -- --mode append
 ```
 
 ### Git Bash on Windows
@@ -84,13 +91,45 @@ In a clone, `sh install.sh` hands over to `install.ps1` and translates the optio
 
 | PowerShell (`install.ps1`) | sh (`install.sh`) | Effect |
 |---|---|---|
-| `-Mode Overlay` (default) | `--mode overlay` (default) | Install the theme file and point `LG_CONFIG_FILE` at it |
+| `-Theme <id>` | `--theme <id>` | Select the catalog theme to activate (Dark Modern by default) |
+| `-ListThemes` | `--list-themes` | List the catalog without changing files or environment variables |
+| `-Mode Overlay` (default) | `--mode overlay` (default) | Install all catalog themes and point `LG_CONFIG_FILE` at the selected one |
 | `-Mode Append` | `--mode append` | Write the theme into `config.yml` instead |
 | `-ConfigDir <dir>` | `--config-dir <dir>` | Use this lazygit config directory |
 | `-Uninstall` | `--uninstall` | Undo either mode |
 | `-NoPersist` | | Change `LG_CONFIG_FILE` only in the current PowerShell session |
 | | `--shell auto\|bash\|zsh\|fish\|all\|none` | Which shell startup files to edit (default `auto`) |
 | | `-h`, `--help` | Show usage |
+
+For example, select Light Modern:
+
+```powershell
+.\install.ps1 -Theme vscode-light-modern
+```
+
+```sh
+sh install.sh --theme vscode-light-modern
+```
+
+For a visibly different dark theme, select Tokyo Night:
+
+```powershell
+.\install.ps1 -Theme tokyo-night
+```
+
+```sh
+sh install.sh --theme tokyo-night
+```
+
+To verify that installation and switching work without changing any terminal settings, select Neon Test. Its magenta focused borders, cyan unfocused borders, yellow search frame, and blue selected row are set directly by LazyGit; it deliberately leaves your terminal foreground and background alone.
+
+```powershell
+.\install.ps1 -Theme neon-test
+```
+
+```sh
+sh install.sh --theme neon-test
+```
 
 ## What the installer changes
 
@@ -106,37 +145,37 @@ The installer works in lazygit's config directory. It asks lazygit for it (`lazy
 
 ### Overlay mode (default)
 
-1. Copies the theme to `<config dir>/themes/vscode-dark-modern.yml`. An existing copy is overwritten, so re-running the installer upgrades the theme.
+1. Copies every catalog theme to `<config dir>/themes/<id>.yml`. The installer records the paths it owns in a small manifest and never overwrites an untracked file that happens to have a catalog name.
 2. Creates an empty `<config dir>/config.yml` if you don't have one. An existing `config.yml` is never modified.
-3. Sets `LG_CONFIG_FILE` to the theme first, then your config:
+3. Sets `LG_CONFIG_FILE` to the selected theme first, then your config:
 
    ```text
-   <config dir>/themes/vscode-dark-modern.yml,<config dir>/config.yml
+   <config dir>/themes/<selected-id>.yml,<config dir>/config.yml
    ```
 
    If `LG_CONFIG_FILE` already lists files, they stay, after the theme, instead of `config.yml`. Running the installer again doesn't add duplicates.
 
    - **Windows:** sets the user environment variable (`HKCU\Environment`). When the installer runs inside your PowerShell session (`.\install.ps1` or the one-liners), it also updates that session; `powershell -File .\install.ps1` runs in a separate process, so only new terminals see the change. If only a machine-wide `LG_CONFIG_FILE` exists, its entries are the starting list. With `-NoPersist`, only the PowerShell session the installer runs in changes (so use `.\install.ps1 -NoPersist`).
-   - **macOS/Linux:** adds a block between `# >>> lazygit-vscode-dark-modern >>>` and `# <<< lazygit-vscode-dark-modern <<<` to your shell startup file. At shell startup, the block puts the theme at the front of `LG_CONFIG_FILE`, followed by `config.yml` (if it exists) or by whatever `LG_CONFIG_FILE` already contained. It does nothing if the theme is already listed or the theme file is gone.
+   - **macOS/Linux:** adds a block between `# >>> lazygit-vscode-dark-modern >>>` and `# <<< lazygit-vscode-dark-modern <<<` to your shell startup file. At shell startup, the block puts the selected theme at the front of `LG_CONFIG_FILE`, removes stale themes from this catalog, then preserves `config.yml` and other entries.
 
      | Shell | File |
      |---|---|
      | bash on Linux | `~/.bashrc` |
      | bash on macOS | `~/.bash_profile` (or an existing `~/.bash_login` or `~/.profile` when bash reads that one instead) |
      | zsh | `~/.zshenv`, plus `$ZDOTDIR/.zshenv` if `ZDOTDIR` is set (a new terminal reads `~/.zshenv`; a zsh started with `ZDOTDIR` already set reads `$ZDOTDIR/.zshenv`) |
-     | fish | `${XDG_CONFIG_HOME:-~/.config}/fish/conf.d/lazygit-vscode-dark-modern.fish` (a separate file) |
+     | fish | `${XDG_CONFIG_HOME:-~/.config}/fish/conf.d/lazygit-vscode-themes.fish` (a separate file) |
      | anything else | `~/.profile` |
 
      `--shell auto` (default) picks by the name of `$SHELL`. `--shell all` sets up bash, zsh and fish. `--shell none` edits nothing and prints what to add yourself.
 
-     The block runs early: zsh reads `.zshenv` before `.zprofile` and `.zshrc`, and fish reads `conf.d` before `config.fish`. If a startup file that runs after the block sets `LG_CONFIG_FILE` itself (for example `export LG_CONFIG_FILE=...` in `.zshrc`, in `.zprofile`, or in `~/.bash_profile` or `~/.profile` after they source `~/.bashrc`, or `set -gx LG_CONFIG_FILE ...` in `config.fish`), it replaces the whole list and the theme is gone. The installer looks for such lines and warns about each one it finds. Put the theme path (`<config dir>/themes/vscode-dark-modern.yml`) at the front of that assignment yourself, or (bash, zsh) move the assignment into the file that holds the block, above the block.
+     The block runs early: zsh reads `.zshenv` before `.zprofile` and `.zshrc`, and fish reads `conf.d` before `config.fish`. If a startup file that runs after the block sets `LG_CONFIG_FILE` itself, it replaces the whole list and the theme is gone. Move that assignment before the block, or make it list the selected theme first.
 
 **Why the theme comes first.** lazygit reads the files in `LG_CONFIG_FILE` in order, and later files override earlier ones key by key. With the theme first:
 
 - Anything in your `config.yml` wins, including colors under `gui.theme`, so `config.yml` is where you customize.
 - It avoids a lazygit bug: when a later file has no `customCommands` key, the `customCommands` from earlier files are loaded twice. The theme has no custom commands and your `config.yml` comes last, so nothing is duplicated.
 
-The installer warns if your `config.yml` already has a `gui.theme` block, because those keys override the theme.
+The installer warns if your `config.yml` already has a `gui.theme` block, because those keys override the theme. To switch themes, run the installer again with another `-Theme` / `--theme` ID. LazyGit merges config files; it has no built-in in-app theme selector.
 
 ### Append mode (`-Mode Append` / `--mode append`)
 
@@ -168,7 +207,7 @@ lazygit --use-config-file "$PWD\themes\vscode-dark-modern.yml,$(lazygit -cd)\con
 - Every listed file must exist. If you don't have a `config.yml` yet, list only the theme.
 - In Git Bash, use `$(pwd -W)` instead of `$PWD`. Git Bash doesn't convert a comma-separated list of `/c/...` paths for `lazygit.exe`.
 
-In PowerShell you can also install for the current session only. This copies the theme file (and creates `config.yml` if missing) but sets `LG_CONFIG_FILE` only in this window:
+In PowerShell you can also install for the current session only. This copies the catalog themes (and creates `config.yml` if missing) but sets `LG_CONFIG_FILE` only in this window:
 
 ```powershell
 Set-ExecutionPolicy -Scope Process Bypass -Force
@@ -223,7 +262,7 @@ Windows:
 powershell -NoProfile -ExecutionPolicy Bypass -File .\uninstall.ps1
 
 # without a clone
-& ([scriptblock]::Create((irm https://raw.githubusercontent.com/OWNER/lazygit-vscode-dark-modern/main/install.ps1))) -Uninstall
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/Makihataima-Ken/lazygit-vscode-themes/main/install.ps1))) -Uninstall
 ```
 
 macOS / Linux:
@@ -233,12 +272,12 @@ macOS / Linux:
 sh uninstall.sh
 
 # without a clone
-curl -fsSL https://raw.githubusercontent.com/OWNER/lazygit-vscode-dark-modern/main/install.sh | sh -s -- --uninstall
+curl -fsSL https://raw.githubusercontent.com/Makihataima-Ken/lazygit-vscode-themes/main/install.sh | sh -s -- --uninstall
 ```
 
 If you installed with `-ConfigDir` / `--config-dir`, pass the same option to uninstall. Uninstalling undoes both modes, whichever you used:
 
-- Removes `<config dir>/themes/vscode-dark-modern.yml`, and the `themes` directory if it's then empty.
+- Removes the manifest-tracked catalog theme files only when they still match the installed source; a modified or older file is preserved with a warning. It removes the `themes` directory only if it is empty.
 - Removes the marked block from `config.yml` if there is one, after saving `config.yml.bak`. `config.yml` itself is never deleted or emptied.
 - Windows: removes the theme from `LG_CONFIG_FILE` (user variable, or only the current session with `-NoPersist`). If nothing is left, or only your `config.yml`, it deletes the variable. Other entries are kept.
 - macOS/Linux: removes the marked blocks from the shell startup files (`~/.bashrc`, `~/.bash_profile`, `~/.bash_login`, `~/.profile`, and `.zshenv` and `.zshrc` in `~`, `$ZDOTDIR` and `~/.config/zsh`, whichever exist) and deletes the fish file.
@@ -247,7 +286,7 @@ Terminals that were already open keep the old `LG_CONFIG_FILE`, and lazygit star
 
 ## Theme colors
 
-All values come from VS Code's Dark Modern theme or the defaults it inherits. `border: single` gives the square corners of VS Code's panels.
+The following table documents Dark Modern. Light Modern and the noticeably more colorful [Tokyo Night](themes/tokyo-night.yml) are defined alongside it. [Neon Test](themes/neon-test.yml) is a terminal-independent installer check: it does not override LazyGit's default foreground color. Every catalogue theme uses `border: single` for square panel corners.
 
 | lazygit key (`gui.theme.`) | Value | VS Code color | What it colors in lazygit |
 |---|---|---|---|
@@ -275,9 +314,9 @@ lazygit also can't paint the background: you see your terminal's. That's why the
 
 ## Terminal colors
 
-If you run lazygit in VS Code's integrated terminal with Dark Modern, the colors already match.
+LazyGit changes its UI colors, not the terminal palette. Select the matching terminal palette yourself: [`vscode-dark-modern.json`](extras/windows-terminal/vscode-dark-modern.json), [`vscode-light-modern.json`](extras/windows-terminal/vscode-light-modern.json), or [`tokyo-night.json`](extras/windows-terminal/tokyo-night.json). The [`neon-test.json`](extras/windows-terminal/neon-test.json) palette is optional: Neon Test remains visibly different without importing it. If you run LazyGit in VS Code's integrated terminal with the same VS Code theme, the colors already match.
 
-**Windows Terminal:** open Settings, then "Open JSON file". Paste the object from [`extras/windows-terminal/vscode-dark-modern.json`](extras/windows-terminal/vscode-dark-modern.json) into the `schemes` list:
+**Windows Terminal:** open Settings, then "Open JSON file". Paste the object for the selected catalog theme into the `schemes` list; Dark Modern, for example:
 
 ```jsonc
 "schemes": [
@@ -289,7 +328,7 @@ If you run lazygit in VS Code's integrated terminal with Dark Modern, the colors
 ],
 ```
 
-Then set `"colorScheme": "VS Code Dark Modern"` in `profiles.defaults` (all profiles) or in one profile. In the Settings UI this is the profile's Appearance > Color scheme.
+Then set the matching scheme name in `profiles.defaults` (all profiles) or in one profile. In the Settings UI this is the profile's Appearance > Color scheme. Switching LazyGit themes does not switch this terminal setting automatically.
 
 **Other terminals:** use these values.
 
@@ -365,23 +404,16 @@ lazygit re-reads its config files when the terminal window regains focus. A chan
 
 ## Publishing your own copy
 
-1. The GitHub URLs in all files use an upper-case placeholder where the owner goes. Replace it with your user or organization, then regenerate the theme copies embedded in the installers (the theme header contains the repository URL). The `[E]` in the pattern keeps these instructions from rewriting themselves:
+1. Optionally, add screenshots for each theme under `docs/`.
 
-   ```sh
-   grep -rlI --exclude-dir=.git 'OWN[E]R' . | xargs perl -pi -e 's/OWN[E]R/your-name/g'
-   sh tools/sync-theme.sh
-   ```
-
-2. Optionally, add a screenshot as `docs/screenshot.png` and show it below the first paragraph of this README with `![lazygit with the VS Code Dark Modern theme](docs/screenshot.png)`.
-
-3. Create an empty repository named `lazygit-vscode-dark-modern` on GitHub, then push:
+2. Create an empty repository named `lazygit-vscode-themes` on GitHub, then push:
 
    ```sh
    git init -b main
    git add .
    git add --chmod=+x install.sh uninstall.sh tools/sync-theme.sh tests/test-install.sh
    git commit -m "Initial release"
-   git remote add origin https://github.com/your-name/lazygit-vscode-dark-modern.git
+   git remote add origin https://github.com/your-name/lazygit-vscode-themes.git
    git push -u origin main
    ```
 
@@ -395,7 +427,9 @@ lazygit re-reads its config files when the terminal window regains focus. A chan
 
 ## Development
 
-- `themes/vscode-dark-modern.yml` is the source of truth. `install.ps1` and `install.sh` each embed a copy for the one-liners. After editing the theme, run `sh tools/sync-theme.sh`. CI runs `sh tools/sync-theme.sh --check`.
+- `themes/catalog.txt` is the source of truth for the supported IDs and display names. Each row requires `themes/<id>.yml` and `extras/windows-terminal/<id>.json`.
+- `install.ps1` and `install.sh` embed the complete catalog for remote one-liners. After changing the catalog or any theme YAML, run `sh tools/sync-theme.sh`. CI runs `sh tools/sync-theme.sh --check`.
+- To add a theme: add its YAML and terminal palette, add its catalog row, run sync, then run both installer test suites.
 - Tests:
 
   ```sh

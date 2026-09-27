@@ -170,7 +170,7 @@ new_sandbox() {
     BASHRC=$HOME/.bashrc
   fi
   ZSHENV=$HOME/.zshenv
-  FISHF=$XDG_CONFIG_HOME/fish/conf.d/lazygit-vscode-dark-modern.fish
+  FISHF=$XDG_CONFIG_HOME/fish/conf.d/lazygit-vscode-themes.fish
   : >"$SB/out"
 }
 
@@ -300,21 +300,23 @@ lg_validate() {
   grep -q -F "$LG_OK_TEXT" "$SB/lg.out"
 }
 
-# extract_sh_theme FILE: the embedded theme of an install.sh.
+# extract_sh_theme FILE ID: the named embedded theme of an install.sh.
 extract_sh_theme() {
-  LC_ALL=C awk '
-    index($0, "cat <<") == 1 && index($0, "LGVDM_THEME_EOF") { f = 1; next }
-    $0 == "LGVDM_THEME_EOF" { f = 0 }
-    f' "$1"
+  _es_delim=$(printf '%s' "$2" | tr '[:lower:]-' '[:upper:]_')
+  LC_ALL=C awk -v id="$2" -v e="LGVDM_THEME_$_es_delim"'_EOF' '
+    $0 ~ "^[ \t]*" id "\\)" { hit = 1; next }
+    hit && index($0, "cat <<") { body = 1; next }
+    body && $0 == e { exit }
+    body { print }' "$1"
 }
 
-# extract_ps1_theme FILE: the embedded theme of an install.ps1.
+# extract_ps1_theme FILE ID: the named embedded theme of an install.ps1.
 extract_ps1_theme() {
   LC_ALL=C awk -v sq="'" '
     { sub(/\r$/, "") }
-    /^[ \t]*\$EmbeddedTheme[ \t]*=[ \t]*@/ { f = 1; next }
+    $0 == "    " id " = @" sq { f = 1; next }
     $0 == sq "@" { f = 0 }
-    f' "$1"
+    f { print }' id="'$2'" "$1"
 }
 
 # ---------------------------------------------------------------------------
@@ -337,22 +339,27 @@ test_01_sync() {
   (cd "$RUN" && sh "$ROOT/tools/sync-theme.sh" --check) >"$SB/out" 2>&1
   ST=$?
   t_status "(1) tools/sync-theme.sh --check passes" 0
-  extract_sh_theme "$ROOT/install.sh" >"$SB/emb-sh"
-  t "(1) install.sh embedded theme is byte-identical to themes/$THEME_FILE_NAME" same "$SB/emb-sh" "$THEME_SRC"
+  for _s_id in $THEME_IDS; do
+    extract_sh_theme "$ROOT/install.sh" "$_s_id" >"$SB/emb-sh-$_s_id"
+    t "(1) install.sh embeds $_s_id byte-identically" same "$SB/emb-sh-$_s_id" "$ROOT/themes/$_s_id.yml"
+    if [ -f "$ROOT/install.ps1" ]; then
+      extract_ps1_theme "$ROOT/install.ps1" "$_s_id" >"$SB/emb-ps1-$_s_id"
+      t "(1) install.ps1 embeds $_s_id byte-identically" same "$SB/emb-ps1-$_s_id" "$ROOT/themes/$_s_id.yml"
+    fi
+  done
   if [ -f "$ROOT/install.ps1" ]; then
-    t "(1) sync-theme --check covered install.ps1" out_has "install.ps1: embedded theme is up to date"
-    extract_ps1_theme "$ROOT/install.ps1" >"$SB/emb-ps1"
-    t "(1) install.ps1 embedded theme is byte-identical to themes/$THEME_FILE_NAME" same "$SB/emb-ps1" "$THEME_SRC"
-  else
-    skip "(1) install.ps1 not present"
+    t "(1) sync-theme --check covered install.ps1" out_has "install.ps1: embedded catalog is up to date"
   fi
 
-  # A copy of the repo with a changed theme: --check fails, sync fixes, idempotent.
+  # A complete copy with one changed catalog theme: --check fails, sync fixes,
+  # and the unaffected catalog entries remain embedded too.
   _s1=$SB/repo
-  mkdir -p "$_s1/themes" "$_s1/tools"
+  mkdir -p "$_s1/tools"
   cp "$ROOT/install.sh" "$_s1/"
+  cp "$ROOT/uninstall.sh" "$_s1/"
   cp "$ROOT/tools/sync-theme.sh" "$_s1/tools/"
-  cp "$THEME_SRC" "$_s1/themes/"
+  cp -R "$ROOT/themes" "$_s1/"
+  cp -R "$ROOT/extras" "$_s1/"
   if [ -f "$ROOT/install.ps1" ]; then cp "$ROOT/install.ps1" "$_s1/"; fi
   printf '# a new last line\n' >>"$_s1/themes/$THEME_FILE_NAME"
   (cd "$RUN" && sh "$_s1/tools/sync-theme.sh" --check) >"$SB/out" 2>&1
@@ -364,15 +371,15 @@ test_01_sync() {
   (cd "$RUN" && sh "$_s1/tools/sync-theme.sh") >"$SB/out" 2>&1
   ST=$?
   t_status "(1) sync-theme.sh regenerates" 0
-  extract_sh_theme "$_s1/install.sh" >"$SB/emb2"
+  extract_sh_theme "$_s1/install.sh" vscode-dark-modern >"$SB/emb2"
   t "(1) regenerated install.sh region holds the changed theme" same "$SB/emb2" "$_s1/themes/$THEME_FILE_NAME"
   if [ -f "$_s1/install.ps1" ]; then
-    extract_ps1_theme "$_s1/install.ps1" >"$SB/emb2ps"
+    extract_ps1_theme "$_s1/install.ps1" vscode-dark-modern >"$SB/emb2ps"
     t "(1) regenerated install.ps1 region holds the changed theme" same "$SB/emb2ps" "$_s1/themes/$THEME_FILE_NAME"
   fi
   # everything outside the region is unchanged
-  LC_ALL=C awk '/^# BEGIN EMBEDDED THEME/ { f = 1 } !f; /^# END EMBEDDED THEME/ { f = 0 }' "$ROOT/install.sh" >"$SB/outside-a"
-  LC_ALL=C awk '/^# BEGIN EMBEDDED THEME/ { f = 1 } !f; /^# END EMBEDDED THEME/ { f = 0 }' "$_s1/install.sh" >"$SB/outside-b"
+  LC_ALL=C awk '/^# BEGIN EMBEDDED CATALOG/ { f = 1 } !f; /^# END EMBEDDED CATALOG/ { f = 0 }' "$ROOT/install.sh" >"$SB/outside-a"
+  LC_ALL=C awk '/^# BEGIN EMBEDDED CATALOG/ { f = 1 } !f; /^# END EMBEDDED CATALOG/ { f = 0 }' "$_s1/install.sh" >"$SB/outside-b"
   t "(1) bytes outside the region are unchanged" same "$SB/outside-a" "$SB/outside-b"
   cp "$_s1/install.sh" "$SB/after-sync1.sh"
   (cd "$RUN" && sh "$_s1/tools/sync-theme.sh" && sh "$_s1/tools/sync-theme.sh" --check) >"$SB/out" 2>&1
@@ -417,6 +424,30 @@ test_02_03_fresh() {
   for _f in "$T" "$C" "$BASHRC" "$ZSHENV" "$FISHF"; do
     t "(3) ${_f##*/} byte-identical after re-run" same "$_f" "$SB/snap/${_f##*/}"
   done
+}
+
+test_03_catalog() {
+  for _cat_id in $THEME_IDS; do
+    new_sandbox "t03-$_cat_id"
+    inst --config-dir "$CFG" --shell none --theme "$_cat_id"
+    t "(3) $_cat_id overlay install exits 0" test "$ST" = 0
+    for _cat_installed in $THEME_IDS; do
+      t "(3) $_cat_id installs catalog file $_cat_installed" same "$CFG/themes/$_cat_installed.yml" "$ROOT/themes/$_cat_installed.yml"
+    done
+    t "(3) $_cat_id selects only itself" out_has "$CFG/themes/$_cat_id.yml,$C"
+    t "(3) $_cat_id has a terminal palette" contains "$ROOT/extras/windows-terminal/$_cat_id.json" '"name"'
+  done
+
+  new_sandbox t03-switch
+  inst --config-dir "$CFG" --shell bash --theme vscode-dark-modern
+  inst --config-dir "$CFG" --shell bash --theme vscode-light-modern
+  _cat_value=$(lg_after sh "$BASHRC" set "$CFG/themes/vscode-dark-modern.yml,$C")
+  t_eq "(3) switching strips stale catalog themes from shell LG_CONFIG_FILE" "$_cat_value" "$CFG/themes/vscode-light-modern.yml,$C|<unset>"
+
+  new_sandbox t03-invalid
+  inst --config-dir "$CFG" --shell none --theme not-a-theme
+  t "(3) invalid theme is rejected before writes" test "$ST" = 1
+  t "(3) invalid theme creates no config directory" missing "$CFG"
 }
 
 test_04_preserve() {
@@ -490,8 +521,8 @@ check_snippet() {
     "$(lg_after "$_cs_sh" "$_cs_rc" set '')" "$T,$C|<unset>"
   t_eq "(5) $_cs_sh: LG_CONFIG_FILE=/x/a.yml -> theme,/x/a.yml" \
     "$(lg_after "$_cs_sh" "$_cs_rc" set /x/a.yml)" "$T,/x/a.yml|<unset>"
-  t_eq "(5) $_cs_sh: theme already listed -> unchanged" \
-    "$(lg_after "$_cs_sh" "$_cs_rc" set "/x/a.yml,$T")" "/x/a.yml,$T|<unset>"
+  t_eq "(5) $_cs_sh: catalog theme already listed -> moved first" \
+    "$(lg_after "$_cs_sh" "$_cs_rc" set "/x/a.yml,$T")" "$T,/x/a.yml|<unset>"
   t_eq "(5) $_cs_sh: sourced twice -> no duplicate" \
     "$(lg_after "$_cs_sh" "$_cs_rc" unset '' twice)" "$T,$C|<unset>"
   t_eq "(5) $_cs_sh: sourced twice with /x/a.yml -> no duplicate" \
@@ -1282,10 +1313,23 @@ main() {
   esac
   ROOT=$(CDPATH='' cd -- "$_m_dir/.." && pwd) || exit 2
   THEME_SRC=$ROOT/themes/$THEME_FILE_NAME
+  CATALOG_SRC=$ROOT/themes/catalog.txt
   [ -f "$THEME_SRC" ] || {
     printf 'cannot find %s\n' "$THEME_SRC" >&2
     exit 2
   }
+  [ -f "$CATALOG_SRC" ] || {
+    printf 'cannot find %s\n' "$CATALOG_SRC" >&2
+    exit 2
+  }
+  THEME_IDS=''
+  while IFS='|' read -r _main_id _main_name _main_extra || [ -n "$_main_id$_main_name$_main_extra" ]; do
+    case $_main_id in '' | \#*) continue ;; esac
+    THEME_IDS="${THEME_IDS}${THEME_IDS:+ }$_main_id"
+    [ -f "$ROOT/themes/$_main_id.yml" ] || exit 2
+    [ -f "$ROOT/extras/windows-terminal/$_main_id.json" ] || exit 2
+  done <"$CATALOG_SRC"
+  [ -n "$THEME_IDS" ] || exit 2
 
   OS=$(uname -s 2>/dev/null) || OS=unknown
   IS_WIN=0
@@ -1316,6 +1360,7 @@ main() {
   test_00_syntax
   test_01_sync
   test_02_03_fresh
+  test_03_catalog
   test_04_preserve
   test_05_snippet
   test_06_paths

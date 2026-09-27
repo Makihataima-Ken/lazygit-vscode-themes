@@ -1,0 +1,43 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/jesseduffield/lazygit/master/schema/config.json
+#
+# Neon Test theme for lazygit
+# https://github.com/Makihataima-Ken/lazygit-vscode-themes
+#
+# A deliberately high-contrast theme for verifying that the installer selected
+# a LazyGit theme. It does not set defaultFgColor, so your terminal's existing
+# foreground and background remain in control. No terminal settings change is
+# needed to see its magenta, cyan, yellow, and blue LazyGit UI accents.
+
+gui:
+  border: single
+
+  theme:
+    # Magenta focused panel frame and tab
+    activeBorderColor:
+      - '#FF00FF'
+      - bold
+    # Cyan unfocused panel frames
+    inactiveBorderColor:
+      - '#00E5FF'
+    # Yellow while searching/filtering
+    searchingActiveBorderColor:
+      - '#FFD600'
+      - bold
+    # Cyan keybinding hints
+    optionsTextColor:
+      - '#00E5FF'
+    # Strong blue selected-row backgrounds, visible over ordinary dark or light terminals
+    selectedLineBgColor:
+      - '#005CFF'
+    inactiveViewSelectedLineBgColor:
+      - '#3D2E78'
+    cherryPickedCommitFgColor:
+      - '#FFFFFF'
+    cherryPickedCommitBgColor:
+      - '#FF00FF'
+    markedBaseCommitFgColor:
+      - '#000000'
+    markedBaseCommitBgColor:
+      - '#FFD600'
+    unstagedChangesColor:
+      - '#FF1744'

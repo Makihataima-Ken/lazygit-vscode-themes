@@ -1,0 +1,9 @@
+# id|display name
+#
+# IDs are stable command-line values.  They must use lowercase letters,
+# numbers and single hyphens only.  Every entry needs both themes/<id>.yml
+# and extras/windows-terminal/<id>.json.
+vscode-dark-modern|VS Code Dark Modern
+vscode-light-modern|VS Code Light Modern
+tokyo-night|Tokyo Night
+neon-test|Neon Test (terminal-independent)

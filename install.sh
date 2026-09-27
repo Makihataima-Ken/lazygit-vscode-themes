@@ -1,14 +1,16 @@
 #!/bin/sh
-# lazygit-vscode-dark-modern installer for macOS and Linux (POSIX sh).
+# lazygit-vscode-themes installer for macOS and Linux (POSIX sh).
 #
-#   curl -fsSL https://raw.githubusercontent.com/OWNER/lazygit-vscode-dark-modern/main/install.sh | sh
+#   curl -fsSL https://raw.githubusercontent.com/Makihataima-Ken/lazygit-vscode-themes/main/install.sh | sh
 #   sh install.sh                    # from a clone (default: overlay mode)
+#   sh install.sh --theme vscode-light-modern
+#   sh install.sh --list-themes
 #   sh install.sh --mode append      # write the theme into config.yml instead
 #   sh install.sh --uninstall        # undo either mode
 #   sh install.sh --help
 #
 # Overlay mode (default) copies the theme to
-#   <lazygit config dir>/themes/vscode-dark-modern.yml
+#   <lazygit config dir>/themes/<catalog theme>.yml
 # and adds a marker-delimited block to your shell startup file that puts the
 # theme FIRST in LG_CONFIG_FILE. Your config.yml is loaded after the theme, so
 # your own settings still win. Nothing outside the marker block is touched.
@@ -20,10 +22,11 @@
 
 set -eu
 
-LGVDM_NAME='lazygit-vscode-dark-modern'
-LGVDM_THEME_ID='vscode-dark-modern'
+LGVDM_NAME='lazygit-vscode-themes'
+LGVDM_DEFAULT_THEME_ID='vscode-dark-modern'
+LGVDM_THEME_ID=''
 LGVDM_REPO_URL='https://github.com/Makihataima-Ken/lazygit-vscode-themes'
-LGVDM_RAW_URL='https://raw.githubusercontent.com/OWNER/lazygit-vscode-dark-modern/main'
+LGVDM_RAW_URL='https://raw.githubusercontent.com/Makihataima-Ken/lazygit-vscode-themes/main'
 LGVDM_BEGIN='# >>> lazygit-vscode-dark-modern >>>'
 LGVDM_END='# <<< lazygit-vscode-dark-modern <<<'
 # Flag lines inside a block. They let --uninstall restore the file exactly.
@@ -58,11 +61,13 @@ note() {
 usage() {
   cat <<'EOF'
 Usage: sh install.sh [options]
-       curl -fsSL https://raw.githubusercontent.com/OWNER/lazygit-vscode-dark-modern/main/install.sh | sh -s -- [options]
+       curl -fsSL https://raw.githubusercontent.com/Makihataima-Ken/lazygit-vscode-themes/main/install.sh | sh -s -- [options]
 
-Installs the VS Code "Dark Modern" theme for lazygit.
+Installs a VS Code-inspired theme for lazygit.
 
 Options:
+  --theme ID         Select a catalog theme (default: vscode-dark-modern).
+  --list-themes      Print available themes and make no changes.
   --mode overlay     (default) Copy the theme to <config dir>/themes/ and load it
                      through LG_CONFIG_FILE, set by a block in your shell startup
                      file. Your config.yml is loaded after the theme and wins.
@@ -77,7 +82,7 @@ Options:
                             any other shell uses ~/.profile
                        bash  ~/.bashrc (macOS: ~/.bash_profile)
                        zsh   ~/.zshenv, and $ZDOTDIR/.zshenv if ZDOTDIR is set
-                       fish  ~/.config/fish/conf.d/lazygit-vscode-dark-modern.fish
+                       fish  ~/.config/fish/conf.d/lazygit-vscode-themes.fish
                        all   bash + zsh + fish
                        none  edit nothing; print what to add yourself
   --uninstall        Undo both modes: remove the theme file, the config.yml
@@ -186,6 +191,8 @@ parse_args() {
   OPT_CONFIG_DIR=''
   OPT_CONFIG_DIR_SET=0
   OPT_SHELL=auto
+  OPT_THEME=$LGVDM_DEFAULT_THEME_ID
+  OPT_LIST=0
   while [ $# -gt 0 ]; do
     case $1 in
       --uninstall) OPT_UNINSTALL=1 ;;
@@ -195,6 +202,13 @@ parse_args() {
         shift
         ;;
       --mode=*) OPT_MODE=${1#*=} ;;
+      --theme)
+        [ $# -ge 2 ] || usage_error "--theme needs a theme ID"
+        OPT_THEME=$2
+        shift
+        ;;
+      --theme=*) OPT_THEME=${1#*=} ;;
+      --list-themes) OPT_LIST=1 ;;
       --config-dir)
         [ $# -ge 2 ] || usage_error "--config-dir needs a directory"
         OPT_CONFIG_DIR=$2
@@ -231,6 +245,9 @@ parse_args() {
   if [ "$OPT_CONFIG_DIR_SET" = 1 ] && [ -z "$OPT_CONFIG_DIR" ]; then
     usage_error "--config-dir needs a non-empty directory"
   fi
+  if [ "$OPT_LIST" = 1 ] && { [ "$OPT_UNINSTALL" = 1 ] || [ "$OPT_MODE" = append ]; }; then
+    usage_error "--list-themes cannot be combined with --uninstall or --mode append"
+  fi
 }
 
 # ---------------------------------------------------------------------------
@@ -255,10 +272,15 @@ delegate_to_windows() {
   fi
   if [ -z "$_dw_ps1" ]; then
     _dw_args=''
-    if [ "$OPT_UNINSTALL" = 1 ]; then
+    if [ "$OPT_LIST" = 1 ]; then
+      _dw_args=' -ListThemes'
+    elif [ "$OPT_UNINSTALL" = 1 ]; then
       _dw_args=' -Uninstall'
     elif [ "$OPT_MODE" = append ]; then
       _dw_args=' -Mode Append'
+    fi
+    if [ "$OPT_THEME" != "$LGVDM_DEFAULT_THEME_ID" ]; then
+      _dw_args="$_dw_args -Theme '$(ps_sq "$OPT_THEME")'"
     fi
     if [ -n "$_dw_dir_win" ]; then
       _dw_args="$_dw_args -ConfigDir '$(ps_sq "$_dw_dir_win")'"
@@ -275,6 +297,9 @@ delegate_to_windows() {
     die "powershell.exe not found; run $(to_windows_path "$_dw_ps1") from PowerShell"
   _dw_ps1_win=$(to_windows_path "$_dw_ps1")
   set --
+  if [ "$OPT_LIST" = 1 ]; then
+    set -- "$@" -ListThemes
+  fi
   if [ "$OPT_UNINSTALL" = 1 ]; then
     set -- "$@" -Uninstall
   fi
@@ -283,6 +308,9 @@ delegate_to_windows() {
   fi
   if [ -n "$_dw_dir_win" ]; then
     set -- "$@" -ConfigDir "$_dw_dir_win"
+  fi
+  if [ "$OPT_THEME" != "$LGVDM_DEFAULT_THEME_ID" ]; then
+    set -- "$@" -Theme "$OPT_THEME"
   fi
   if [ "$OPT_SHELL" != auto ]; then
     say "Note: --shell is ignored on Windows (LG_CONFIG_FILE is a user environment variable there)."
@@ -322,6 +350,12 @@ resolve_config_dir() {
   CONFIG_FILE=$CONFIG_DIR_ABS/config.yml
   THEMES_DIR=$CONFIG_DIR_ABS/themes
   THEME_DEST=$THEMES_DIR/$LGVDM_THEME_ID.yml
+  MANAGED_FILE=$THEMES_DIR/.lazygit-vscode-themes-managed
+  OWNED_THEME_LIST=''
+  for _rc_id in $THEME_IDS; do
+    _rc_theme=$THEMES_DIR/$_rc_id.yml
+    OWNED_THEME_LIST="${OWNED_THEME_LIST}${OWNED_THEME_LIST:+,}$_rc_theme"
+  done
 }
 
 # bash_rc_file: the startup file bash reads for new terminals.
@@ -381,17 +415,91 @@ uninstall_command() {
 # ---------------------------------------------------------------------------
 # theme source
 
-# write_theme_to FILE: the theme from the clone next to this script if there
-# is one, else the copy embedded at the bottom of this script.
-write_theme_to() {
-  if [ -n "$SCRIPT_DIR" ] && [ -f "$SCRIPT_DIR/themes/$LGVDM_THEME_ID.yml" ]; then
-    THEME_ORIGIN="$SCRIPT_DIR/themes/$LGVDM_THEME_ID.yml"
-    normalize_text <"$THEME_ORIGIN" >"$1"
+# catalog_stream: print the source catalog in clone mode, otherwise the copy
+# embedded in this installer for curl | sh installs.
+catalog_stream() {
+  if [ -n "$SCRIPT_DIR" ] && [ -f "$SCRIPT_DIR/themes/catalog.txt" ]; then
+    cat "$SCRIPT_DIR/themes/catalog.txt"
   else
-    THEME_ORIGIN='embedded copy (inside this script)'
-    embedded_theme >"$1"
+    embedded_catalog
   fi
-  [ -s "$1" ] || die "the theme is empty ($THEME_ORIGIN)"
+}
+
+# load_catalog validates the portable id|display-name catalog before any user
+# file is changed. A clone also proves that every entry has a terminal palette.
+load_catalog() {
+  : >"$LGVDM_TMP/catalog" || die "cannot create a temporary catalog"
+  catalog_stream >"$LGVDM_TMP/catalog" || die "cannot read the theme catalog"
+  THEME_IDS=''
+  while IFS='|' read -r _lc_id _lc_name _lc_extra || [ -n "$_lc_id$_lc_name$_lc_extra" ]; do
+    _lc_id=$(printf '%s' "$_lc_id" | tr -d '\r' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+    _lc_name=$(printf '%s' "$_lc_name" | tr -d '\r' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+    _lc_extra=$(printf '%s' "$_lc_extra" | tr -d '\r')
+    [ -n "$_lc_id" ] || continue
+    [ "${_lc_id#\#}" = "$_lc_id" ] || continue
+    printf '%s\n' "$_lc_id" | grep -Eq '^[a-z0-9]$|^[a-z0-9]([a-z0-9-]*[a-z0-9])$' || die "invalid catalog theme ID '$_lc_id'"
+    if printf '%s\n' "$_lc_id" | grep -q -- '--'; then die "invalid catalog theme ID '$_lc_id'"; fi
+    [ -n "$_lc_name" ] && [ -z "$_lc_extra" ] || die "invalid catalog line for $_lc_id (expected id|display name)"
+    if printf '%s\n' " $THEME_IDS " | grep -Fq " $_lc_id "; then die "duplicate catalog theme ID: $_lc_id"; fi
+    if [ -n "$SCRIPT_DIR" ] && [ -f "$SCRIPT_DIR/themes/catalog.txt" ]; then
+      [ -f "$SCRIPT_DIR/themes/$_lc_id.yml" ] || die "catalog theme $_lc_id is missing themes/$_lc_id.yml"
+      [ -f "$SCRIPT_DIR/extras/windows-terminal/$_lc_id.json" ] || die "catalog theme $_lc_id is missing extras/windows-terminal/$_lc_id.json"
+    fi
+    THEME_IDS="${THEME_IDS}${THEME_IDS:+ }$_lc_id"
+  done <"$LGVDM_TMP/catalog"
+  [ -n "$THEME_IDS" ] || die "the theme catalog is empty"
+  case " $THEME_IDS " in *" $OPT_THEME "*) ;; *) die "unknown theme '$OPT_THEME'. Run --list-themes to see available IDs." ;; esac
+  LGVDM_THEME_ID=$OPT_THEME
+}
+
+list_themes() {
+  say 'Available themes:'
+  while IFS='|' read -r _lt_id _lt_name; do
+    [ -n "$_lt_id" ] || continue
+    [ "${_lt_id#\#}" = "$_lt_id" ] || continue
+    printf '  %-24s %s\n' "$_lt_id" "$_lt_name"
+  done <"$LGVDM_TMP/catalog"
+}
+
+theme_dest() { printf '%s/%s.yml\n' "$THEMES_DIR" "$1"; }
+
+load_managed_ids() {
+  MANAGED_IDS=''
+  if [ -f "$MANAGED_FILE" ]; then
+    while IFS= read -r _mi || [ -n "$_mi" ]; do
+      case " $THEME_IDS " in *" $_mi "*) MANAGED_IDS="${MANAGED_IDS}${MANAGED_IDS:+ }$_mi" ;; esac
+    done <"$MANAGED_FILE"
+  fi
+  # Migration from the single-theme installer: only adopt a file that still
+  # identifies this repository, never an arbitrary colliding file.
+  _mi_legacy=$(theme_dest "$LGVDM_DEFAULT_THEME_ID")
+  if [ -z "$MANAGED_IDS" ] && [ -f "$_mi_legacy" ] && grep -q 'lazygit-vscode-themes' "$_mi_legacy"; then
+    MANAGED_IDS=$LGVDM_DEFAULT_THEME_ID
+  fi
+}
+
+is_managed_id() {
+  case " $MANAGED_IDS " in *" $1 "*) return 0 ;; *) return 1 ;; esac
+}
+
+write_managed_ids() {
+  : >"$MANAGED_FILE" || die "cannot write $MANAGED_FILE"
+  for _wm_id in $THEME_IDS; do printf '%s\n' "$_wm_id" >>"$MANAGED_FILE"; done
+}
+
+# write_theme_to ID FILE: the theme from the clone next to this script if
+# there is one, else the matching copy embedded at the bottom of this script.
+write_theme_to() {
+  _wt_id=$1
+  _wt_out=$2
+  if [ -n "$SCRIPT_DIR" ] && [ -f "$SCRIPT_DIR/themes/$_wt_id.yml" ]; then
+    THEME_ORIGIN="$SCRIPT_DIR/themes/$_wt_id.yml"
+    normalize_text <"$THEME_ORIGIN" >"$_wt_out"
+  else
+    THEME_ORIGIN="embedded copy for $_wt_id (inside this script)"
+    embedded_theme "$_wt_id" >"$_wt_out"
+  fi
+  [ -s "$_wt_out" ] || die "the theme is empty ($THEME_ORIGIN)"
 }
 
 # ---------------------------------------------------------------------------
@@ -539,14 +647,14 @@ write_file() {
 # shell snippets
 
 # posix_block OUT CREATED ADDNL: the block for bash/zsh/sh startup files.
-# It puts the theme first in LG_CONFIG_FILE each time a shell starts, unless
-# it is already listed, and does nothing once the theme file is gone.
+# It puts the selected theme first in LG_CONFIG_FILE and removes stale catalog
+# themes first, so switching themes never leaves a merged mixture behind.
 # shellcheck disable=SC2016 # the $ in the snippet lines is for the startup file
 posix_block() {
   _q="'"
   {
     printf '%s\n' "$LGVDM_BEGIN"
-    printf '%s\n' "# Loads the VS Code Dark Modern theme for lazygit before your own config.yml."
+    printf '%s\n' "# Loads the selected VS Code theme for lazygit before your own config.yml."
     printf '%s\n' "# From $LGVDM_REPO_URL - remove with: install.sh --uninstall"
     if [ "$2" = 1 ]; then
       printf '%s\n' "$LGVDM_FLAG_CREATED"
@@ -556,14 +664,19 @@ posix_block() {
     fi
     printf '%s\n' "lgvdm_theme=$_q$(sq "$THEME_DEST")$_q"
     printf '%s\n' "lgvdm_config=$_q$(sq "$CONFIG_FILE")$_q"
+    printf '%s\n' "lgvdm_owned=$_q$(sq "$OWNED_THEME_LIST")$_q"
     printf '%s\n' 'if [ -f "$lgvdm_theme" ]; then'
-    printf '%s\n' '  case ",${LG_CONFIG_FILE-}," in'
-    printf '%s\n' '    *,"$lgvdm_theme",*) ;;'
-    printf '%s\n' '    ,,) if [ -f "$lgvdm_config" ]; then export LG_CONFIG_FILE="$lgvdm_theme,$lgvdm_config"; else export LG_CONFIG_FILE="$lgvdm_theme"; fi ;;'
-    printf '%s\n' '    *) export LG_CONFIG_FILE="$lgvdm_theme,$LG_CONFIG_FILE" ;;'
-    printf '%s\n' '  esac'
+    printf '%s\n' '  lgvdm_rest='
+    printf '%s\n' '  lgvdm_oldifs=$IFS; IFS=,'
+    printf '%s\n' '  for lgvdm_entry in ${LG_CONFIG_FILE-}; do'
+    printf '%s\n' '    [ -n "$lgvdm_entry" ] || continue'
+    printf '%s\n' '    case ",$lgvdm_owned," in *,"$lgvdm_entry",*) ;; *) lgvdm_rest=${lgvdm_rest:+$lgvdm_rest,}$lgvdm_entry ;; esac'
+    printf '%s\n' '  done'
+    printf '%s\n' '  IFS=$lgvdm_oldifs'
+    printf '%s\n' '  if [ -z "$lgvdm_rest" ] && [ -f "$lgvdm_config" ]; then lgvdm_rest=$lgvdm_config; fi'
+    printf '%s\n' '  export LG_CONFIG_FILE="$lgvdm_theme${lgvdm_rest:+,$lgvdm_rest}"'
     printf '%s\n' 'fi'
-    printf '%s\n' 'unset lgvdm_theme lgvdm_config'
+    printf '%s\n' 'unset lgvdm_theme lgvdm_config lgvdm_owned lgvdm_rest lgvdm_oldifs lgvdm_entry'
     printf '%s\n' "$LGVDM_END"
   } >"$1"
 }
@@ -574,22 +687,22 @@ fish_block() {
   _q="'"
   {
     printf '%s\n' "$LGVDM_BEGIN"
-    printf '%s\n' "# Loads the VS Code Dark Modern theme for lazygit before your own config.yml."
+    printf '%s\n' "# Loads the selected VS Code theme for lazygit before your own config.yml."
     printf '%s\n' "# From $LGVDM_REPO_URL - remove with: install.sh --uninstall"
     printf '%s\n' "set -l lgvdm_theme $_q$(fish_sq "$THEME_DEST")$_q"
     printf '%s\n' "set -l lgvdm_config $_q$(fish_sq "$CONFIG_FILE")$_q"
+    printf '%s\n' "set -l lgvdm_owned $_q$(fish_sq "$OWNED_THEME_LIST")$_q"
     printf '%s\n' 'if test -f "$lgvdm_theme"'
-    printf '%s\n' "    if not contains -- \"\$lgvdm_theme\" (string split -- ',' \"\$LG_CONFIG_FILE\")"
-    printf '%s\n' '        if test -z "$LG_CONFIG_FILE"'
-    printf '%s\n' '            if test -f "$lgvdm_config"'
-    printf '%s\n' '                set -gx LG_CONFIG_FILE "$lgvdm_theme,$lgvdm_config"'
-    printf '%s\n' '            else'
-    printf '%s\n' '                set -gx LG_CONFIG_FILE "$lgvdm_theme"'
-    printf '%s\n' '            end'
-    printf '%s\n' '        else'
-    printf '%s\n' '            set -gx LG_CONFIG_FILE "$lgvdm_theme,$LG_CONFIG_FILE"'
+    printf '%s\n' '    set -l lgvdm_rest'
+    printf '%s\n' '    for lgvdm_entry in (string split -- '"'"','"'"' "$LG_CONFIG_FILE")'
+    printf '%s\n' '        if test -n "$lgvdm_entry"; and not contains -- "$lgvdm_entry" (string split -- '"'"','"'"' "$lgvdm_owned")'
+    printf '%s\n' '            set -a lgvdm_rest "$lgvdm_entry"'
     printf '%s\n' '        end'
     printf '%s\n' '    end'
+    printf '%s\n' '    if test (count $lgvdm_rest) -eq 0; and test -f "$lgvdm_config"'
+    printf '%s\n' '        set -a lgvdm_rest "$lgvdm_config"'
+    printf '%s\n' '    end'
+    printf '%s\n' '    set -gx LG_CONFIG_FILE (string join '"'"','"'"' "$lgvdm_theme" $lgvdm_rest)'
     printf '%s\n' 'end'
     printf '%s\n' "$LGVDM_END"
   } >"$1"
@@ -826,11 +939,15 @@ setup_shells() {
 # current_value: what LG_CONFIG_FILE becomes when the block runs in this
 # environment (same logic as the snippet).
 current_value() {
-  case ",${LG_CONFIG_FILE-}," in
-    *,"$THEME_DEST",*) printf '%s\n' "$LG_CONFIG_FILE" ;;
-    ,,) printf '%s\n' "$THEME_DEST,$CONFIG_FILE" ;;
-    *) printf '%s\n' "$THEME_DEST,$LG_CONFIG_FILE" ;;
-  esac
+  _cv_rest=''
+  _cv_ifs=$IFS; IFS=,
+  for _cv_entry in ${LG_CONFIG_FILE-}; do
+    [ -n "$_cv_entry" ] || continue
+    case ",$OWNED_THEME_LIST," in *,"$_cv_entry",*) ;; *) _cv_rest=${_cv_rest:+$_cv_rest,}$_cv_entry ;; esac
+  done
+  IFS=$_cv_ifs
+  if [ -z "$_cv_rest" ] && [ -f "$CONFIG_FILE" ]; then _cv_rest=$CONFIG_FILE; fi
+  printf '%s\n' "$THEME_DEST${_cv_rest:+,$_cv_rest}"
 }
 
 # print_lines FILE: FILE indented, between blank lines, to copy by hand.
@@ -911,18 +1028,32 @@ do_overlay() {
     *,*) die "the config directory contains a comma ($CONFIG_DIR_ABS); LG_CONFIG_FILE is a comma-separated list and cannot hold it. Use --mode append instead." ;;
   esac
   mkdir -p "$THEMES_DIR" || die "cannot create $THEMES_DIR"
-  write_theme_to "$LGVDM_TMP/theme.yml"
-  if [ -e "$THEME_DEST" ]; then
-    write_file "$LGVDM_TMP/theme.yml" "$THEME_DEST"
-    if [ "$WROTE" = 1 ]; then
-      note "$THEME_DEST: updated (from $THEME_ORIGIN)"
-    else
-      note "$THEME_DEST: already up to date"
+  load_managed_ids
+  # Detect every collision before writing anything. A user file named like a
+  # catalog theme is never silently claimed or overwritten.
+  for _ov_id in $THEME_IDS; do
+    _ov_dest=$(theme_dest "$_ov_id")
+    if [ -e "$_ov_dest" ] && ! is_managed_id "$_ov_id"; then
+      die "refusing to overwrite untracked theme file $_ov_dest; rename or remove it, then run the installer again"
     fi
-  else
-    cat "$LGVDM_TMP/theme.yml" >"$THEME_DEST" || die "cannot write $THEME_DEST"
-    note "$THEME_DEST: installed (from $THEME_ORIGIN)"
-  fi
+  done
+  for _ov_id in $THEME_IDS; do
+    _ov_src=$LGVDM_TMP/theme-$_ov_id.yml
+    _ov_dest=$(theme_dest "$_ov_id")
+    write_theme_to "$_ov_id" "$_ov_src"
+    if [ -e "$_ov_dest" ]; then
+      write_file "$_ov_src" "$_ov_dest"
+      if [ "$WROTE" = 1 ]; then
+        note "$_ov_dest: updated (from $THEME_ORIGIN)"
+      else
+        note "$_ov_dest: already up to date"
+      fi
+    else
+      cat "$_ov_src" >"$_ov_dest" || die "cannot write $_ov_dest"
+      note "$_ov_dest: installed (from $THEME_ORIGIN)"
+    fi
+  done
+  write_managed_ids
   if [ -e "$CONFIG_FILE" ] || [ -L "$CONFIG_FILE" ]; then
     [ -f "$CONFIG_FILE" ] || die "$CONFIG_FILE exists but is not a regular file"
   else
@@ -958,8 +1089,7 @@ do_overlay() {
   if [ "$SHOW_FISH_HINT" = 1 ]; then
     detail "   fish: set -gx LG_CONFIG_FILE '$(fish_sq "$_ov_value")'"
   fi
-  detail "2. Set your terminal colors to match: background #181818 and the ANSI palette"
-  detail "   from extras/ ($LGVDM_REPO_URL/tree/main/extras)."
+  detail "2. Import extras/windows-terminal/$LGVDM_THEME_ID.json in your terminal to match the theme."
   detail "Your own settings go in $CONFIG_FILE; it is loaded after the theme, so it wins."
   detail "lazygit started from a GUI or IDE launcher may not see LG_CONFIG_FILE; use --mode append there."
   say "Undo: $(uninstall_command)"
@@ -972,7 +1102,7 @@ theme_sum() { cksum <"$1" | awk '{ print $1, $2 }'; }
 yaml_block() {
   {
     printf '%s\n' "$LGVDM_BEGIN"
-    printf '%s\n' "# VS Code Dark Modern theme for lazygit, from $LGVDM_REPO_URL"
+    printf '%s\n' "# $LGVDM_THEME_ID theme for lazygit, from $LGVDM_REPO_URL"
     printf '%s\n' "# Re-running the installer with --mode append replaces this whole block; --uninstall removes it."
     if [ "$2" = 1 ]; then
       printf '%s\n' "$LGVDM_FLAG_NEWLINE"
@@ -1032,7 +1162,7 @@ refuse_append() {
 
 do_append() {
   EDITED_COPY=''
-  write_theme_to "$LGVDM_TMP/theme.yml"
+  write_theme_to "$LGVDM_THEME_ID" "$LGVDM_TMP/theme.yml"
   _ap_block=$LGVDM_TMP/yaml.block
   _ap_new=$LGVDM_TMP/config.new
   if [ -e "$CONFIG_FILE" ] || [ -L "$CONFIG_FILE" ]; then
@@ -1156,9 +1286,22 @@ remove_fish_file() {
 
 do_uninstall() {
   RC_CHANGED=0
-  if [ -e "$THEME_DEST" ] || [ -L "$THEME_DEST" ]; then
-    rm -f "$THEME_DEST"
-    note "$THEME_DEST: deleted"
+  load_managed_ids
+  for _un_id in $MANAGED_IDS; do
+    _un_dest=$(theme_dest "$_un_id")
+    [ -f "$_un_dest" ] || continue
+    _un_source=$LGVDM_TMP/uninstall-$_un_id.yml
+    write_theme_to "$_un_id" "$_un_source"
+    if same_content "$_un_source" "$_un_dest"; then
+      rm -f "$_un_dest"
+      note "$_un_dest: deleted"
+    else
+      warn "kept modified or older managed theme $_un_dest; it is no longer tracked (remove it manually if unwanted)"
+    fi
+  done
+  if [ -f "$MANAGED_FILE" ]; then
+    rm -f "$MANAGED_FILE"
+    note "$MANAGED_FILE: deleted"
   fi
   if [ -d "$THEMES_DIR" ] && rmdir "$THEMES_DIR" 2>/dev/null; then
     note "$THEMES_DIR: deleted (it was empty)"
@@ -1187,6 +1330,7 @@ do_uninstall() {
   done <"$LGVDM_TMP/zsh.dirs"
   remove_fish_file "$(fish_file)"
   remove_fish_file "$HOME/.config/fish/conf.d/$LGVDM_NAME.fish"
+  remove_fish_file "$HOME/.config/fish/conf.d/lazygit-vscode-dark-modern.fish"
 
   if [ -z "$LGVDM_CHANGES" ]; then
     say "Nothing to uninstall: no $LGVDM_NAME files or blocks found (config dir: $CONFIG_DIR_ABS)."
@@ -1201,28 +1345,26 @@ do_uninstall() {
   say "Restart lazygit to see its default colors again."
 }
 
-# print_env_hint: this shell may still have the theme in LG_CONFIG_FILE.
+# print_env_hint: this shell may still have one or more catalog themes in
+# LG_CONFIG_FILE. The command it prints removes every catalog path.
 print_env_hint() {
-  case ",${LG_CONFIG_FILE-}," in
-    *,"$THEME_DEST",*) ;;
-    *)
-      if [ "$RC_CHANGED" = 1 ]; then
-        say "Shells that are already open keep LG_CONFIG_FILE until they are restarted (to clear it now: unset LG_CONFIG_FILE)."
-      fi
-      return 0
-      ;;
-  esac
+  _eh_has=0
   _eh_rest=''
   _eh_ifs=$IFS
   IFS=,
   set -f
-  for _eh_entry in $LG_CONFIG_FILE; do
-    if [ -n "$_eh_entry" ] && [ "$_eh_entry" != "$THEME_DEST" ]; then
-      _eh_rest=${_eh_rest:+$_eh_rest,}$_eh_entry
-    fi
+  for _eh_entry in ${LG_CONFIG_FILE-}; do
+    [ -n "$_eh_entry" ] || continue
+    case ",$OWNED_THEME_LIST," in *,"$_eh_entry",*) _eh_has=1 ;; *) _eh_rest=${_eh_rest:+$_eh_rest,}$_eh_entry ;; esac
   done
   set +f
   IFS=$_eh_ifs
+  if [ "$_eh_has" = 0 ]; then
+    if [ "$RC_CHANGED" = 1 ]; then
+      say "Shells that are already open keep LG_CONFIG_FILE until they are restarted (to clear it now: unset LG_CONFIG_FILE)."
+    fi
+    return 0
+  fi
   say "This shell still has the theme in LG_CONFIG_FILE until it is restarted. To fix it now, run:"
   if [ -z "$_eh_rest" ] || [ "$_eh_rest" = "$CONFIG_FILE" ]; then
     detail "unset LG_CONFIG_FILE          (fish: set -e LG_CONFIG_FILE)"
@@ -1233,9 +1375,19 @@ print_env_hint() {
 }
 
 # ---------------------------------------------------------------------------
-# BEGIN EMBEDDED THEME (generated by tools/sync-theme.sh - do not edit by hand)
+# BEGIN EMBEDDED CATALOG (generated by tools/sync-theme.sh - do not edit by hand)
+embedded_catalog() {
+cat <<'LGVDM_CATALOG_EOF'
+vscode-dark-modern|VS Code Dark Modern
+vscode-light-modern|VS Code Light Modern
+tokyo-night|Tokyo Night
+neon-test|Neon Test (terminal-independent)
+LGVDM_CATALOG_EOF
+}
 embedded_theme() {
-cat <<'LGVDM_THEME_EOF'
+  case $1 in
+    vscode-dark-modern)
+      cat <<'LGVDM_THEME_VSCODE_DARK_MODERN_EOF'
 # yaml-language-server: $schema=https://raw.githubusercontent.com/jesseduffield/lazygit/master/schema/config.json
 #
 # VS Code "Dark Modern" theme for lazygit
@@ -1298,9 +1450,167 @@ gui:
     # foreground
     defaultFgColor:
       - '#CCCCCC'
-LGVDM_THEME_EOF
+LGVDM_THEME_VSCODE_DARK_MODERN_EOF
+      ;;
+    vscode-light-modern)
+      cat <<'LGVDM_THEME_VSCODE_LIGHT_MODERN_EOF'
+# yaml-language-server: $schema=https://raw.githubusercontent.com/jesseduffield/lazygit/master/schema/config.json
+#
+# VS Code "Light Modern" theme for lazygit
+# https://github.com/Makihataima-Ken/lazygit-vscode-themes
+#
+# Colors come from VS Code's own Light Modern theme and inherited defaults
+# (microsoft/vscode). LazyGit cannot paint the terminal background; use the
+# matching Windows Terminal palette in extras/windows-terminal/.
+
+gui:
+  # VS Code panels have square corners.
+  border: single
+
+  theme:
+    # focusBorder / tab.activeBorderTop
+    activeBorderColor:
+      - '#005FB8'
+      - bold
+    # activityBar.inactiveForeground
+    inactiveBorderColor:
+      - '#616161'
+    # list.warningForeground
+    searchingActiveBorderColor:
+      - '#855F00'
+      - bold
+    # textLink.foreground
+    optionsTextColor:
+      - '#005FB8'
+    # list.activeSelectionBackground
+    selectedLineBgColor:
+      - '#E8E8E8'
+    # list.inactiveSelectionBackground
+    inactiveViewSelectedLineBgColor:
+      - '#E4E6F1'
+    # button.foreground on button.background
+    cherryPickedCommitFgColor:
+      - '#FFFFFF'
+    cherryPickedCommitBgColor:
+      - '#005FB8'
+    # editor.findMatchBackground, composited over #FFFFFF
+    markedBaseCommitFgColor:
+      - '#3B3B3B'
+    markedBaseCommitBgColor:
+      - '#D9B44A'
+    # Git decoration modified-resource foreground
+    unstagedChangesColor:
+      - '#895503'
+    # foreground
+    defaultFgColor:
+      - '#3B3B3B'
+LGVDM_THEME_VSCODE_LIGHT_MODERN_EOF
+      ;;
+    tokyo-night)
+      cat <<'LGVDM_THEME_TOKYO_NIGHT_EOF'
+# yaml-language-server: $schema=https://raw.githubusercontent.com/jesseduffield/lazygit/master/schema/config.json
+#
+# Tokyo Night theme for lazygit
+# https://github.com/Makihataima-Ken/lazygit-vscode-themes
+#
+# Based on the Tokyo Night `night` palette by folke/tokyonight.nvim:
+# https://github.com/folke/tokyonight.nvim/blob/main/extras/lazygit/tokyonight_night.yml
+#
+# LazyGit cannot paint the terminal background. Set it to #1A1B26 and select
+# extras/windows-terminal/tokyo-night.json to make its ANSI colors match.
+
+gui:
+  # Keep the catalogue's square panel corners.
+  border: single
+
+  theme:
+    # Orange focus color
+    activeBorderColor:
+      - '#FF9E64'
+      - bold
+    # Cyan unfocused panel frames
+    inactiveBorderColor:
+      - '#27A1B9'
+    # Orange search/filter focus
+    searchingActiveBorderColor:
+      - '#FF9E64'
+      - bold
+    # Blue keybinding hints
+    optionsTextColor:
+      - '#7AA2F7'
+    # Deep blue selected-row background
+    selectedLineBgColor:
+      - '#283457'
+    # A slightly quieter selected row in an unfocused view
+    inactiveViewSelectedLineBgColor:
+      - '#1F2335'
+    cherryPickedCommitFgColor:
+      - '#7AA2F7'
+    cherryPickedCommitBgColor:
+      - '#BB9AF7'
+    markedBaseCommitFgColor:
+      - '#1A1B26'
+    markedBaseCommitBgColor:
+      - '#E0AF68'
+    # Red status letter for unstaged changes
+    unstagedChangesColor:
+      - '#DB4B4B'
+    # Pale blue foreground
+    defaultFgColor:
+      - '#C0CAF5'
+LGVDM_THEME_TOKYO_NIGHT_EOF
+      ;;
+    neon-test)
+      cat <<'LGVDM_THEME_NEON_TEST_EOF'
+# yaml-language-server: $schema=https://raw.githubusercontent.com/jesseduffield/lazygit/master/schema/config.json
+#
+# Neon Test theme for lazygit
+# https://github.com/Makihataima-Ken/lazygit-vscode-themes
+#
+# A deliberately high-contrast theme for verifying that the installer selected
+# a LazyGit theme. It does not set defaultFgColor, so your terminal's existing
+# foreground and background remain in control. No terminal settings change is
+# needed to see its magenta, cyan, yellow, and blue LazyGit UI accents.
+
+gui:
+  border: single
+
+  theme:
+    # Magenta focused panel frame and tab
+    activeBorderColor:
+      - '#FF00FF'
+      - bold
+    # Cyan unfocused panel frames
+    inactiveBorderColor:
+      - '#00E5FF'
+    # Yellow while searching/filtering
+    searchingActiveBorderColor:
+      - '#FFD600'
+      - bold
+    # Cyan keybinding hints
+    optionsTextColor:
+      - '#00E5FF'
+    # Strong blue selected-row backgrounds, visible over ordinary dark or light terminals
+    selectedLineBgColor:
+      - '#005CFF'
+    inactiveViewSelectedLineBgColor:
+      - '#3D2E78'
+    cherryPickedCommitFgColor:
+      - '#FFFFFF'
+    cherryPickedCommitBgColor:
+      - '#FF00FF'
+    markedBaseCommitFgColor:
+      - '#000000'
+    markedBaseCommitBgColor:
+      - '#FFD600'
+    unstagedChangesColor:
+      - '#FF1744'
+LGVDM_THEME_NEON_TEST_EOF
+      ;;
+    *) return 1 ;;
+  esac
 }
-# END EMBEDDED THEME
+# END EMBEDDED CATALOG
 
 main() {
   LGVDM_CHANGES=''
@@ -1318,6 +1628,11 @@ main() {
   [ -n "${HOME:-}" ] || die "HOME is not set"
   command -v awk >/dev/null 2>&1 || die "awk is required"
   setup_tmp
+  load_catalog
+  if [ "$OPT_LIST" = 1 ]; then
+    list_themes
+    return 0
+  fi
   resolve_config_dir
   if [ -z "$OPT_CONFIG_DIR" ]; then
     say "lazygit config directory: $CONFIG_DIR_ABS (use --config-dir to choose another)"

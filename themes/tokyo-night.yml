@@ -1,0 +1,50 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/jesseduffield/lazygit/master/schema/config.json
+#
+# Tokyo Night theme for lazygit
+# https://github.com/Makihataima-Ken/lazygit-vscode-themes
+#
+# Based on the Tokyo Night `night` palette by folke/tokyonight.nvim:
+# https://github.com/folke/tokyonight.nvim/blob/main/extras/lazygit/tokyonight_night.yml
+#
+# LazyGit cannot paint the terminal background. Set it to #1A1B26 and select
+# extras/windows-terminal/tokyo-night.json to make its ANSI colors match.
+
+gui:
+  # Keep the catalogue's square panel corners.
+  border: single
+
+  theme:
+    # Orange focus color
+    activeBorderColor:
+      - '#FF9E64'
+      - bold
+    # Cyan unfocused panel frames
+    inactiveBorderColor:
+      - '#27A1B9'
+    # Orange search/filter focus
+    searchingActiveBorderColor:
+      - '#FF9E64'
+      - bold
+    # Blue keybinding hints
+    optionsTextColor:
+      - '#7AA2F7'
+    # Deep blue selected-row background
+    selectedLineBgColor:
+      - '#283457'
+    # A slightly quieter selected row in an unfocused view
+    inactiveViewSelectedLineBgColor:
+      - '#1F2335'
+    cherryPickedCommitFgColor:
+      - '#7AA2F7'
+    cherryPickedCommitBgColor:
+      - '#BB9AF7'
+    markedBaseCommitFgColor:
+      - '#1A1B26'
+    markedBaseCommitBgColor:
+      - '#E0AF68'
+    # Red status letter for unstaged changes
+    unstagedChangesColor:
+      - '#DB4B4B'
+    # Pale blue foreground
+    defaultFgColor:
+      - '#C0CAF5'

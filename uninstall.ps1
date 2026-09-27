@@ -1,4 +1,4 @@
-# uninstall.ps1 - remove the VS Code "Dark Modern" lazygit theme (Windows)
+# uninstall.ps1 - remove the VS Code-inspired lazygit themes (Windows)
 # https://github.com/Makihataima-Ken/lazygit-vscode-themes
 #
 #   powershell -NoProfile -ExecutionPolicy Bypass -File .\uninstall.ps1 [-ConfigDir DIR] [-NoPersist]
@@ -17,7 +17,7 @@ param(
     [switch]$NoPersist
 )
 
-function Uninstall-LazygitVSCodeDarkModern {
+function Uninstall-LazygitVSCodeThemes {
     param(
         [string]$ConfigDir,
         [switch]$NoPersist
@@ -33,17 +33,17 @@ function Uninstall-LazygitVSCodeDarkModern {
         return
     }
 
-    $url = 'https://raw.githubusercontent.com/OWNER/lazygit-vscode-dark-modern/main/install.ps1'
+    $url = 'https://raw.githubusercontent.com/Makihataima-Ken/lazygit-vscode-themes/main/install.ps1'
     try {
         [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
     } catch { }
-    Write-Host "[lazygit-vscode-dark-modern] install.ps1 is not next to this script; running $url -Uninstall"
+    Write-Host "[lazygit-vscode-themes] install.ps1 is not next to this script; running $url -Uninstall"
     $code = Invoke-RestMethod -Uri $url -UseBasicParsing
     & ([scriptblock]::Create([string]$code)) -Uninstall -ConfigDir $ConfigDir -NoPersist:$NoPersist
 }
 
 try {
-    Uninstall-LazygitVSCodeDarkModern -ConfigDir $ConfigDir -NoPersist:$NoPersist
+    Uninstall-LazygitVSCodeThemes -ConfigDir $ConfigDir -NoPersist:$NoPersist
 } finally {
-    Remove-Item -LiteralPath 'Function:\Uninstall-LazygitVSCodeDarkModern' -ErrorAction SilentlyContinue
+    Remove-Item -LiteralPath 'Function:\Uninstall-LazygitVSCodeThemes' -ErrorAction SilentlyContinue
 }

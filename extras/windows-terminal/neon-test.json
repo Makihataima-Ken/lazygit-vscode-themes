@@ -1,0 +1,23 @@
+{
+  "name": "Neon Test",
+  "background": "#111111",
+  "foreground": "#F5F5F5",
+  "cursorColor": "#00E5FF",
+  "selectionBackground": "#005CFF",
+  "black": "#111111",
+  "red": "#FF1744",
+  "green": "#00E676",
+  "yellow": "#FFD600",
+  "blue": "#005CFF",
+  "purple": "#FF00FF",
+  "cyan": "#00E5FF",
+  "white": "#F5F5F5",
+  "brightBlack": "#616161",
+  "brightRed": "#FF5252",
+  "brightGreen": "#69F0AE",
+  "brightYellow": "#FFFF00",
+  "brightBlue": "#2979FF",
+  "brightPurple": "#EA80FC",
+  "brightCyan": "#84FFFF",
+  "brightWhite": "#FFFFFF"
+}

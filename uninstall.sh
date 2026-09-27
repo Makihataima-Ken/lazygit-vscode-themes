@@ -1,11 +1,11 @@
 #!/bin/sh
-# uninstall.sh - remove lazygit-vscode-dark-modern (both install modes).
+# uninstall.sh - remove lazygit-vscode-themes (both install modes).
 #
 #   sh uninstall.sh [--config-dir DIR]
 #
 # Same as: sh install.sh --uninstall [options]. See: sh install.sh --help
 # Without a clone:
-#   curl -fsSL https://raw.githubusercontent.com/OWNER/lazygit-vscode-dark-modern/main/install.sh | sh -s -- --uninstall
+#   curl -fsSL https://raw.githubusercontent.com/Makihataima-Ken/lazygit-vscode-themes/main/install.sh | sh -s -- --uninstall
 
 set -eu
 
@@ -24,9 +24,9 @@ main() {
   fi
   if [ -z "$_un_dir" ] || [ ! -f "$_un_dir/install.sh" ] ||
     ! grep -q -F -e '# >>> lazygit-vscode-dark-modern >>>' "$_un_dir/install.sh"; then
-    printf '[lazygit-vscode-dark-modern] ERROR: the install.sh of lazygit-vscode-dark-modern is not next to uninstall.sh.\n' >&2
+    printf '[lazygit-vscode-themes] ERROR: the install.sh of lazygit-vscode-themes is not next to uninstall.sh.\n' >&2
     printf 'Run instead:\n' >&2
-    printf '    curl -fsSL https://raw.githubusercontent.com/OWNER/lazygit-vscode-dark-modern/main/install.sh | sh -s -- --uninstall\n' >&2
+    printf '    curl -fsSL https://raw.githubusercontent.com/Makihataima-Ken/lazygit-vscode-themes/main/install.sh | sh -s -- --uninstall\n' >&2
     exit 1
   fi
   exec sh "$_un_dir/install.sh" --uninstall "$@"

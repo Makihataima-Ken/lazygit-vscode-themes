@@ -1,0 +1,50 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/jesseduffield/lazygit/master/schema/config.json
+#
+# VS Code "Light Modern" theme for lazygit
+# https://github.com/Makihataima-Ken/lazygit-vscode-themes
+#
+# Colors come from VS Code's own Light Modern theme and inherited defaults
+# (microsoft/vscode). LazyGit cannot paint the terminal background; use the
+# matching Windows Terminal palette in extras/windows-terminal/.
+
+gui:
+  # VS Code panels have square corners.
+  border: single
+
+  theme:
+    # focusBorder / tab.activeBorderTop
+    activeBorderColor:
+      - '#005FB8'
+      - bold
+    # activityBar.inactiveForeground
+    inactiveBorderColor:
+      - '#616161'
+    # list.warningForeground
+    searchingActiveBorderColor:
+      - '#855F00'
+      - bold
+    # textLink.foreground
+    optionsTextColor:
+      - '#005FB8'
+    # list.activeSelectionBackground
+    selectedLineBgColor:
+      - '#E8E8E8'
+    # list.inactiveSelectionBackground
+    inactiveViewSelectedLineBgColor:
+      - '#E4E6F1'
+    # button.foreground on button.background
+    cherryPickedCommitFgColor:
+      - '#FFFFFF'
+    cherryPickedCommitBgColor:
+      - '#005FB8'
+    # editor.findMatchBackground, composited over #FFFFFF
+    markedBaseCommitFgColor:
+      - '#3B3B3B'
+    markedBaseCommitBgColor:
+      - '#D9B44A'
+    # Git decoration modified-resource foreground
+    unstagedChangesColor:
+      - '#895503'
+    # foreground
+    defaultFgColor:
+      - '#3B3B3B'

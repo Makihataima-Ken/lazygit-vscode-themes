@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Catalog-driven theme installation with VS Code Dark Modern, Light Modern, and Tokyo Night.
+- Tokyo Night UI theme and matching Windows Terminal palette, based on the Tokyo Night `night` palette.
+- Neon Test UI theme: a high-contrast installer check that does not require changing terminal settings.
+- `-Theme` / `--theme` selection and `-ListThemes` / `--list-themes` discovery commands.
+- Matching Windows Terminal palette files for every catalog theme.
+
+### Changed
+
+- Remote installers embed the complete catalog, not one hard-coded theme.
+- Overlay installs copy every catalog theme, activate only the selection, and track owned files for safe uninstallation.
+
 ## [1.0.0] - 2026-09-26
 
 ### Added
